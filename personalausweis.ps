@@ -1,0 +1,129 @@
+%!PS-Adobe-2.0
+
+42 srand
+
+/wohnort rand 10000 mod (0000) cvs def
+% usw. klappt noch nicht ganz - Strings müssen feste Länge haben
+% (also mit Nullen am Anfang aufgefüllt werden)
+
+% ACHTUNG! Führende Nullen nicht weglassen (der 7. April ist 07 04)
+/wohnort (4711) def
+/nummer (11111) def
+
+/gebjahr (73) def
+/gebmonat (07) def
+/gebtag (09) def
+
+/abljahr (09) def
+/ablmonat (09) def
+/abltag (07) def
+
+% globale Variablen
+/schriftgroesse 18 def
+/Courier findfont schriftgroesse scalefont setfont
+/vstart 750 def
+/vschritt schriftgroesse neg -5 add def
+/hstart 10 def
+
+% Einzelprüfsummen erzeugen
+wohnort 0 1 getinterval cvi 7 mul
+wohnort 1 1 getinterval cvi 3 mul
+wohnort 2 1 getinterval cvi 1 mul
+wohnort 3 1 getinterval cvi 7 mul
+nummer 0 1 getinterval cvi 3 mul
+nummer 1 1 getinterval cvi 1 mul
+nummer 2 1 getinterval cvi 7 mul
+nummer 3 1 getinterval cvi 3 mul
+nummer 4 1 getinterval cvi 1 mul
+add add add add add add add add
+10 mod
+
+gebjahr 0 1 getinterval cvi 7 mul
+gebjahr 1 1 getinterval cvi 3 mul
+gebmonat 0 1 getinterval cvi 1 mul
+gebmonat 1 1 getinterval cvi 7 mul
+gebtag 0 1 getinterval cvi 3 mul
+gebtag 1 1 getinterval cvi 1 mul
+add add add add add
+10 mod
+
+abljahr 0 1 getinterval cvi 7 mul
+abljahr 1 1 getinterval cvi 3 mul
+ablmonat 0 1 getinterval cvi 1 mul
+ablmonat 1 1 getinterval cvi 7 mul
+abltag 0 1 getinterval cvi 3 mul
+abltag 1 1 getinterval cvi 1 mul
+add add add add add
+10 mod
+
+% Werte kopieren und gewichten
+2 index 7 mul
+2 index 3 mul
+2 index 1 mul
+
+% Gesamtprüfsumme erzeugen
+wohnort 0 1 getinterval cvi 7 mul
+wohnort 1 1 getinterval cvi 3 mul
+wohnort 2 1 getinterval cvi 1 mul
+wohnort 3 1 getinterval cvi 7 mul
+nummer 0 1 getinterval cvi 3 mul
+nummer 1 1 getinterval cvi 1 mul
+nummer 2 1 getinterval cvi 7 mul
+nummer 3 1 getinterval cvi 3 mul
+nummer 4 1 getinterval cvi 1 mul
+
+gebjahr 0 1 getinterval cvi 3 mul
+gebjahr 1 1 getinterval cvi 1 mul
+gebmonat 0 1 getinterval cvi 7 mul
+gebmonat 1 1 getinterval cvi 3 mul
+gebtag 0 1 getinterval cvi 1 mul
+gebtag 1 1 getinterval cvi 7 mul
+
+abljahr 0 1 getinterval cvi 1 mul
+abljahr 1 1 getinterval cvi 7 mul
+ablmonat 0 1 getinterval cvi 3 mul
+ablmonat 1 1 getinterval cvi 1 mul
+abltag 0 1 getinterval cvi 7 mul
+abltag 1 1 getinterval cvi 3 mul
+
+% alles addieren -> letzte Prüfsumme
+-5 count add {add} repeat
+10 mod
+
+% Ausgabe
+/scratch 128 string def
+10 800 moveto (Bedeutung der Ziffern:) show
+hstart vstart moveto
+wohnort scratch cvs show
+nummer scratch cvs show
+3 index (0) cvs show
+(D<<) show
+gebjahr scratch cvs show
+gebmonat scratch cvs show
+gebtag scratch cvs show
+2 index (0) cvs show
+(<) show
+abljahr scratch cvs show
+ablmonat scratch cvs show
+abltag scratch cvs show
+1 index (0) cvs show
+(<<<<<<) show
+0 index (000) cvs show
+
+vstart vschritt add dup hstart exch moveto
+(Erstwohnsitz Kennzahl: ) show wohnort scratch cvs show
+vschritt add dup hstart exch moveto 
+(laufende Zaehlnummer: ) show nummer scratch cvs show
+vschritt add dup hstart exch moveto 
+(Geburtstag-Jahr: ) show gebjahr scratch cvs show
+vschritt add dup hstart exch moveto 
+(Geburtstag-Monat: ) show gebmonat scratch cvs show
+vschritt add dup hstart exch moveto 
+(Geburtstag-Tag: ) show gebtag scratch cvs show
+vschritt add dup hstart exch moveto 
+(Ablaufdatum-Jahr: ) show abljahr scratch cvs show
+vschritt add dup hstart exch moveto 
+(Ablaufdatum-Monat: ) show ablmonat scratch cvs show
+vschritt add dup hstart exch moveto 
+(Ablaufdatum-Tag: ) show abltag scratch cvs show
+

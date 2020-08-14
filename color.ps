@@ -1,0 +1,96 @@
+%!PS-Adobe-3.0 EPSF-3.0
+
+%
+% Fills the page with squares of random color.
+%
+%
+% Changelog:
+% 2018-09-16 (rja):
+% - initial version
+%
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% initialisation
+42 srand
+
+% set page size to A4 landscape
+<< /PageSize [842 595] >> setpagedevice
+
+% define unit to be 1cm ((72 dots/inch) / (2.54 cm/inch))
+/unit 72 2.54 div def
+/squaresize 1 def
+
+unit unit scale
+0 setlinewidth
+0 0 translate
+
+% max drawing size
+/hmax 21 def % horizontally
+/vmax 30 def % vertically
+% color properties
+/csummin 1.0 def % r+g+b must be larger than this
+/cpwdist 0.3 def % |r-g| or |g-b| or |b-r| must be larger than this
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% functions
+
+% draw a square of size a at the current position
+% input a
+/square {
+    1 dict begin
+	/a exch def
+	%    newpath
+	a 0 rmoveto
+	0 a neg rlineto
+	a neg 0 rlineto
+	0 a rlineto
+	closepath
+	fill
+    end
+} def
+
+% a random number between 0 and 1
+/rfloat {
+    rand 16#7fffffff div
+} def
+
+% get a random color
+% input: spread
+% output: r g b (each a random value between 0 and 1)
+/rcolor {
+    1 dict begin
+    {
+	/r rfloat def
+	/g rfloat def
+	/b rfloat def
+	% compare sum
+	r g b add add
+	% larger than csummin
+	csummin gt
+	% one of the pair-wise distances large enough
+	r g sub abs cpwdist gt
+	g b sub abs cpwdist gt or
+	b r sub abs cpwdist gt or
+	and {exit} if
+    } loop
+    r g b
+    end
+} def
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% main program
+
+% horizontal loop
+0 squaresize hmax {
+    /x exch def
+    % vertical loop
+    0 squaresize vmax {
+	/y exch def
+	% move to point
+	x y moveto
+	% select color
+	rcolor setrgbcolor
+	% draw square
+	squaresize square
+    } for
+} for

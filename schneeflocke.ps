@@ -1,0 +1,68 @@
+%!PS-Adobe-2.0
+
+%
+% zeichnet eine Koch'sche Schneeflocke
+%
+
+% /Arial findfont 20 scalefont setfont
+0.1 setlinewidth
+
+
+% -------- Variablen ------------
+/tiefe 0 def
+/tiefe_max 6 def
+/laenge 1600 def
+/winkel 60 def
+
+/teile {
+  % Eingabe: X Y
+  % Ausgabe: X / (3^Y)  und  -1
+  exch     % X und Y tauschen
+  3 div    % X/3 berechnen
+  exch     % X/3 und Y tauschen
+  1 sub    % Y-1 berechnen
+  dup 0 ge {
+    teile
+  } if
+} def
+
+/linie { % zeichnet die Grundlinie
+  0 0 moveto
+  laenge tiefe teile pop 0
+  rlineto
+} def
+
+% eine Ebene runter bzw. hoch gehen
+/down {/tiefe tiefe 1 add def} def
+/up {/tiefe tiefe 1 sub def} def
+% Koordinatensystem verschieben ...
+/+ { laenge tiefe teile pop 0 translate } def
+/- { laenge tiefe teile pop neg 0 translate } def
+% und drehen
+/L { winkel rotate } def
+/R { winkel neg rotate } def
+
+/Pfeil
+{
+  tiefe 1 add tiefe_max eq {
+    linie
+  } if
+
+  down
+  tiefe tiefe_max le {
+    Pfeil
+    + L Pfeil R -
+    + + Pfeil - -
+    + L + R R Pfeil L L - R -
+  } if
+  up
+} def
+
+% -------- Hauptteil ------------
+% Länge Winkel XUrsprung YUrsprung
+30 600 translate
+Pfeil
++ R R Pfeil
++ R R Pfeil
+stroke
+showpage

@@ -1,0 +1,43 @@
+%!PS-Adobe-2.0
+
+% -- Variablen --
+/alpha 30 def
+/abstand 5 def
+/laenge 40 def
+/anzahl 70 def
+/drehen 5 def 
+
+% interessante Werte:
+% alpha abstand anzahl drehen
+%    30       5     40      5
+%    40       5     80      5
+
+
+
+% -- malt eine Linie und dreht das Koordinatensystem --
+% -- vorher auf dem Stack: a b
+% -- nachher auf dem Stack: a' b'
+/male {
+  % draw a 
+  dup 0 moveto
+  dup 0 exch alpha sin alpha cos div mul rlineto
+  % rotate coordinate system
+  0 0 moveto alpha rotate
+  % calculate new b
+  alpha cos div
+} def
+
+300 300 translate
+%1 1 anzahl {
+%initial increment limit proc for
+/foo 0 def
+anzahl {
+  gsave 
+  abstand laenge {male} repeat stroke 
+  grestore
+  drehen rotate
+  /foo foo 1 anzahl 1 sub div add def foo setgray % Farbe
+} repeat
+%} for
+stroke
+showpage

@@ -1,0 +1,300 @@
+%!
+
+% drawing parametrized two dimensional curves using cubic splines
+%
+%
+%
+
+
+/squaresize 5 72 div def
+/pi 3.1415926 def
+
+72 72 scale
+1 72 div setlinewidth
+4 5 translate
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% helper methods
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% draws a square of the given size at the current position
+% Input: size
+/square {
+    1 dict begin
+	newpath
+	moveto
+	/a exch def
+	a 2 div dup rmoveto
+	0 a neg rlineto
+	a neg 0 rlineto
+	0 a rlineto
+	closepath
+	fill
+    end
+} def
+
+
+% sin for radians
+/rsin {
+  % transform [0,2PI] to [0,360°]
+  180 pi div mul
+  sin
+} def
+
+% cos for radians
+/rcos {
+  % transform [0,2PI] to [0,360°]
+  180 pi div mul
+  cos
+} def
+
+
+% draws a coordinate system
+/coord {
+  1 dict begin
+    /size exch def
+    /nsize size -1 mul def
+    
+    % thin lines
+    0.9 setgray
+    nsize 1 size {
+      /zaehler exch def
+      % horizontal
+      nsize zaehler moveto size zaehler lineto stroke
+      % vertical
+      zaehler nsize moveto zaehler size lineto stroke
+    } for
+    
+    % x- and y-axis
+    0.7 setgray
+    nsize 0 moveto size 0 lineto stroke 
+    0 nsize moveto 0 size lineto stroke 
+  end
+} def
+
+
+% prepares helper points for spline
+% given:  f(t) = (fx,fy), f'(t) = (dfx,dfy), delta
+% Input:  fx fy            dfx            dfy delta
+% Output: fx fy fx+delta/3*dfx fy+delta/3*dfy 
+/diff {
+  1 dict begin
+    3 div /delta exch def
+    /dfy exch def
+    /dfx exch def
+    2 copy             % stack: fx fy fx fy 
+    delta dfy mul add  % stack: fx fy fx (fy+delta/3*dfy)
+    exch               
+    delta dfx mul add  % stack: fx fy (fy+delta/3*dfy) (fx+delta/3+dfy)
+    exch
+  end
+} def
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% main method
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% draws a bezier curve with helper lines
+% Input: P1x, P1y, P2x, P2y, P3x, P3y, P4x, P4y
+/bezier {
+  1 dict begin
+    /P4y exch def
+    /P4x exch def
+    /P3y exch def
+    /P3x exch def
+    /P2y exch def
+    /P2x exch def
+    /P1y exch def
+    /P1x exch def
+
+    % draw helper lines
+    % 0.5 setgray
+    1 0 0 setrgbcolor
+    P1x P1y moveto P2x P2y lineto stroke
+    0 1 0 setrgbcolor
+    P3x P3y moveto P4x P4y lineto stroke
+
+    % draw points
+    0.5 setgray
+    squaresize P1x P1y square
+    squaresize P2x P2y square
+    squaresize P3x P3y square
+    squaresize P4x P4y square
+    
+    % draw bezier curve
+    0 setgray
+    P1x P1y moveto
+    P1x P1y P2x P2y P3x P3y P4x P4y curveto
+    stroke
+  end
+} def
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% curves
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% x²
+% Input: t
+% Output: x, y, x', y'
+%         t  t² 1   2t
+/fsqr {
+  /t exch def
+  t 
+  t t mul 
+  1 
+  2 t mul
+} def
+
+% x^4
+% Input: t
+% Output: x, y,   x', y'
+%         t  t^4  1   4t^3
+/f4 {
+  /t exch def
+  t 
+  t t mul dup mul
+  1 
+  4 t t t mul mul mul
+} def
+
+% x^5
+% Input: t
+% Output: x, y,   x', y'
+%         t  t^5  1   5t^4
+/f5 {
+  /t exch def
+  t 
+  t t mul dup mul t mul
+  1 
+  5 t t t mul mul mul t mul
+} def
+
+% x^3
+% Input: t
+% Output: x, y,   x', y'
+%         t  t^3  1   3t^2
+/fk {
+  1 dict begin
+    /t exch def
+    t 
+    t t t mul mul
+    1 
+    3 t t mul mul
+  end
+} def
+
+% circle around origin
+% Input:  t
+% Output: x         y         x'         y'
+%         r cos t   r sin t   -r sin t   -r cos t
+/fc {
+  % do calculation
+  1 dict begin
+    /t exch def % arc
+    /r 1 def    % radius
+    r t rcos mul
+    r t rsin mul
+    r -1 mul t rsin mul
+    r  1 mul t rcos mul
+  end
+} def
+
+% spiral around origin
+% Input:  t
+% Output: x          y         x'         y'
+%         tr cos t   tr sin t   -r sin t   -r cos t
+/f {
+  % do calculation
+  1 dict begin
+    /t exch def % arc
+    /r 0.1 def    % radius
+    r t rcos mul t mul
+    r t rsin mul t mul
+    r -1 mul t rsin mul t mul t rcos r mul add 
+    r  1 mul t rcos mul t mul t rsin r mul add 
+  end
+} def
+
+
+% sin
+/fs {
+  1 dict begin
+    /t exch def 
+    t 
+    t ssin
+    1
+    t scos 
+  end
+} def
+
+
+
+% sin x, x^2
+/fsin {
+  1 dict begin
+    /t exch def
+    t ssin
+    t t mul
+    t scos
+    2 t mul
+  end
+} def
+
+% cos x, x^2
+/fcos {
+  1 dict begin
+    /t exch def
+    t scos
+    t t mul
+    t ssin -1 mul
+    2 t mul
+  end
+} def
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% main 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% draw coordinate system
+4 coord
+
+% define for-loop step size, start, and end
+
+% circle
+%/forstep 1 def
+%/forstart -1 pi mul def
+%/forend pi def
+
+% spiral
+/forstep  pi 2 div def
+/forstart 0 pi mul def
+/forend  10 pi mul def
+
+% x^k
+%/forstep   0.5 def
+%/forstart -1 def
+%/forend    1 def
+
+% draw curve
+forstart forstep forend {
+  /t exch def
+
+  % first two points
+  t f forstep diff
+  % second two points
+  t forstep add f forstep -1 mul diff 4 2 roll
+  % draw
+  bezier
+
+} for
+
+
+showpage

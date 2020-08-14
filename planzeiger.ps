@@ -1,0 +1,509 @@
+%!PS-Adobe-2.0
+
+%
+% Zeichnet einen Planzeiger ähnlich dem des DAV
+%
+
+% Koordinatensystem initialisieren
+% Einheit: 1mm
+% Überlegung: 72 Postscript-Punkte sind ein Zoll, ein Zoll sind 25,4 mm
+2.8346456692 2.8346456692 scale
+10 10 translate
+
+% Standard-Linienbreite: 1/4 mm
+/lw 0.25 def
+lw setlinewidth
+
+% Schriftdefinitionen
+/font-big    {/Helvetica findfont 4 scalefont setfont} def
+/font-normal {/Helvetica findfont 3 scalefont setfont} def
+/font-small  {/Helvetica findfont 2 scalefont setfont} def
+font-normal
+
+%
+% draws a rectangle with the given side lengths
+% w h
+/draw-rectangle {
+    /w exch def
+    /h exch def
+    newpath
+    0 0 moveto
+    w 0 rlineto
+    0 h rlineto
+    w neg 0 rlineto
+    closepath
+    stroke
+} def
+
+%
+% draws several parallel lines
+% input:
+%   k: number of lines
+%   l: length of lines
+%   d: distance between lines
+%
+/draw-hparallels {
+    /d exch def  % distance
+    /l exch def  % length
+    /k exch def  % number of lines
+
+    newpath
+    l d neg moveto	% initial position
+    0 1 k {		% i
+	pop		% (i is unused)
+	l neg d rmoveto % move to upper left \
+	l 0 rlineto     % line to the right
+    } for
+    stroke
+} def
+% see doc for draw-hparallels
+/draw-vparallels{
+    /d exch def  % distance
+    /l exch def  % length
+    /k exch def  % number of lines
+
+    newpath
+    d neg l moveto	% initial position
+    1 1 k {		% i
+	pop		% (i is unused)
+	d l neg rmoveto % move to upper left \
+	0 l rlineto     % line to the right
+    } for
+    stroke
+} def
+
+
+% start inc end distance suffix prefix
+/print-hnumbers {
+    /suf exch def
+    /pre exch def
+    /dist exch def
+    {
+	dist 0 rmoveto
+	% we use gsave & grestore to not alter our
+	% position by printing the characters
+	gsave
+	    % TODO: estimate width of string and then
+	    %       center at position
+	    pre show (   ) cvs show suf show
+	grestore
+    } for
+} def
+
+% start inc end distance suffix prefix
+/print-vnumbers {
+    /suf exch def
+    /pre exch def
+    /dist exch def
+    {
+	0 dist rmoveto
+	gsave
+	    pre show (   ) cvs show suf show
+	grestore
+    } for
+} def
+
+% prints numbers for angles
+% start end distance r rot
+/print-anumbers {
+    /rot exch def
+    /r exch def
+    dup /dist exch def
+    gsave
+    exch {
+	dist neg rotate
+	gsave
+	r 0 translate
+	rot rotate
+	-2 0 moveto
+	(   ) cvs show
+	grestore
+    } for
+    grestore
+} def
+
+
+/draw-angles {		% r1 r2 angle
+    /angle exch def	% r1 r2
+    /r2 exch def	% r1
+    /r1 exch def
+    gsave
+    newpath
+    0 angle 360 {	% alpha
+	pop
+	angle rotate
+	0 r1 moveto
+	0 r2 lineto
+    } for
+    stroke
+    grestore
+} def
+
+
+%
+% Draws a circle with radius r into a rectangle with side lengths a
+% and b. The center of the circle is at position (x,y)
+%
+% input: r x y a b
+/draw-rectcircle {
+    /b exch def
+    /a exch def
+    /y exch def
+    /x exch def
+    /r exch def
+    newpath
+    a y moveto
+    x r add y lineto	% line to circle
+    x y r 0 360 arc	% outer circle
+    a y lineto		% line to outside
+    a 0 lineto		% square around circles
+    0 0 lineto
+    0 b lineto
+    a b lineto
+    closepath
+} def
+
+%
+% array: numbers which should be written
+% start inc end: angles (Hangneigung)
+% dist: distance units between consecutive Höhenlinien
+% length: line length
+%
+% leaves x position of last drawn line on stack
+%
+% array start inc end dist length
+/draw-neigung {		% a start inc end dist length
+    /l exch def		% a start inc end dist
+    /dist exch def	% a start inc end
+    /e exch def		% a start inc
+    /inc exch def	% a start
+    /s exch def		% a
+    0			% a 0
+    newpath		% a 0
+    0 0 moveto		% a 0
+    s 1 e {		% a 0 neig
+	dup		% a 0 neig neig
+	dist		% a 0 neig neig dist
+	calc-dist-neigung % a 0 neig s
+	3 -1 roll add	% a neig s
+	exch		% a s neig
+	dup		% a s neig neig
+	% if neig mod inc == 0, then draw neigung
+	inc mod		% a s neig (neig mod inc)
+	0 eq		% a s neig (neig mod inc == 0)
+	{		% a s neig
+	    % draw line
+	    0 l rlineto
+	    % print angle
+	    dup		% a s neig neig
+	    4 -1 roll	% s neig neig a
+	    if-pop-array
+	    {		% s neig a
+		3 1 roll% a s neig
+		gsave
+		    -1 1.7 rmoveto
+		    (   ) cvs show /degree glyphshow % show text
+		grestore
+	    } {
+		3 1 roll
+		pop
+	    } ifelse
+	} {pop} ifelse
+	dup		% a s s
+	0 moveto	% a s
+    } for		% a s
+    stroke		% a s
+    exch pop		% s
+    % leave x position of last line on stack
+    % subtract last distance from s ...
+    e dist calc-dist-neigung	% s se
+    sub				% s - se
+} def
+
+%
+% Höhenlinien für feste Neigung
+%
+%
+% neig dist number length
+/draw-hoehenlinie {	% neig dist number l
+    lw 2 div setlinewidth
+    /l exch def		% neig dist number
+    3 2 roll		% dist number neig
+    dup			% dist number neig neig
+    4 -1 roll		% number neig neig dist
+    calc-dist-neigung	% number neig s
+    /s exch def		% number neig
+    0 1			% number neig 1 1
+    4 -1 roll		% neig 1 1 number
+    newpath
+    s neg 0 moveto
+    {			% neig
+	s mul 0 moveto
+	0 l rlineto
+    } for
+    1 -2.5 rmoveto
+    font-small
+    (   ) cvs show /degree glyphshow
+    stroke
+} def
+%
+% tan(x) = sin(x) / cos(x)
+%
+% x
+%
+/tan {		% x
+    dup		% x
+    sin		% x sin(x)
+    exch	% sin(x) x
+    cos		% sin(x) cos(x)
+    div		% sin(x) / cos(x)
+} def
+
+% winkel dist
+/calc-dist-neigung {	% winkel dist
+    exch		% dist winkel
+    tan			% dist tan(winkel)
+    div			% dist / tan(winkel)
+} def
+
+%
+% numbers: array with Beschriftungen which should be printed
+%
+% numbers start end dist
+/draw-hoehenlinien {
+    gsave
+    font-small
+    /dist exch def
+    /e exch def
+    /s exch def
+    lw 2 div setlinewidth
+    [] s  1 e dist 4 draw-neigung pop	%  1°
+    lw setlinewidth
+       s  5 e dist 5 draw-neigung pop	%  5°
+    [] s 10 e dist 6 draw-neigung	% 10°
+    % draw horizontal line using last x position on stack
+    4 moveto 0 4 lineto stroke
+    grestore
+} def
+
+%
+% start: i [array]
+% end:   [array] i==a1
+%
+% t = a1 == i
+% if t == true, then a1 is removed
+/if-pop-array {	% i []
+    % check length of array
+    dup		% i [] []
+    length	% i [] l
+    0 gt	% i [] l>0
+    {
+	dup
+	% compare first element of array with i
+	0 get	% i [] a1
+	3 -1 roll	% [] a1 i
+	eq		% [] a1==i
+	dup		% [] a1==i a1==i
+	{		% [] a1==i
+	    exch	% a1==i []
+	    array-pop
+	    exch
+	} if	% [] a1==i
+    } {		% i []
+	exch pop false
+    } ifelse
+} def
+
+% removes the first element from the given array
+/array-pop {		% []
+    dup			% [] []
+    length		% [] l
+    1 sub		% [] (l-1)
+    1 exch		% [] 1 (l-1)
+    getinterval		% []
+} def
+
+
+/draw-scale-25 {
+    lw 2 div setlinewidth
+    % 0.025 km
+    200 3 4 5 div draw-hparallels
+    % 0.1 km
+    40 4 4 draw-hparallels
+    % 0.5 km
+    lw setlinewidth
+    9 4 20 draw-hparallels
+    -90 rotate
+    -182 5 moveto 0 0.5 4 20 () () print-hnumbers
+    5 0 rmoveto (km) show
+    font-big -105 3 rmoveto (1:25 000) show
+} def
+
+% [s1 s2 s3] length
+/draw-scale {
+    /le exch def
+    aload pop
+    lw 2 div setlinewidth
+    dup le exch idiv 3 3 -1 roll draw-hparallels
+    dup le exch idiv 4 3 -1 roll draw-hparallels
+    lw setlinewidth
+    dup le exch idiv 4 3 -1 roll draw-hparallels
+} def
+
+/draw-scale-50 {
+    [10 2 1] 160 draw-scale
+    -90 rotate
+    -180.7 5 moveto 0 1 8 20 () () print-hnumbers
+    3 0 rmoveto (km) show
+    font-big -85 3 rmoveto (1:50 000) show
+} def
+
+/draw-scale-1cm {
+    lw 2 div setlinewidth
+    % 1 mm
+    120 -2.8 1 draw-vparallels
+    % 5 mm
+    lw setlinewidth
+    5 0 translate
+    24 -3 5 draw-vparallels
+    % 10 mm
+    12 -4 10 draw-vparallels
+    -2 -7 moveto 1 1 11 10 () () print-hnumbers
+    3 0 rmoveto (cm) show
+} def
+
+/draw-raster {
+    % 4cm x 4cm square
+    40 40 draw-rectangle
+    % raster
+    lw 2 div setlinewidth
+    10 40 4 draw-hparallels
+    10 40 4 draw-vparallels
+    % axes
+    0 0 moveto
+    font-small
+    -5 -3 moveto   0 1 9 4 (.) () print-hnumbers 3 0 rmoveto (1 km) show
+    41 -4.5 moveto 0 1 9 4 (.) () print-vnumbers 0 4 rmoveto (1 km) show
+    font-normal
+    % title
+    13 43 moveto
+    (1:25 000) show
+} def
+
+/draw-goniometer {
+    % inner lattice
+    gsave
+	45 50 36 0 360 arc clip
+	10 10 translate
+	9 70 10 draw-hparallels
+	15 80 5 draw-vparallels
+	% small scales
+	10 20 translate
+	50 -1.5 1 draw-vparallels
+	40 -1.5 1 draw-hparallels
+	0 40 translate
+	50 1.5 1 draw-vparallels
+	50 -40 translate
+	40 1.5 1 draw-hparallels
+	% dicke Linien
+	lw 2 mul setlinewidth
+	-25 20 translate
+	-30 0 moveto 30 0 lineto
+	0 -30 moveto 0 30 lineto
+	stroke
+    grestore
+    % outer lattice
+    gsave
+	0 2 translate
+	45 45 48 90 95 draw-rectcircle clip
+	19 93 5 draw-vparallels
+	0 .5 translate
+	90 1.5 1 draw-vparallels
+    grestore
+    % angles circle
+    45 50 translate
+    lw setlinewidth
+    newpath 0 0 45 0 360 arc stroke
+    40 45 10 draw-angles
+    41 45 5 draw-angles
+    43 45 1 draw-angles
+    % angle numbers
+    % start end distance r rot voffset hoffset
+    gsave
+	 90 rotate  10  80 10 37 -90 print-anumbers
+	-90 rotate 100 170 10 39  90 print-anumbers
+	-90 rotate 190 260 10 39  90 print-anumbers
+	-90 rotate 280 350 10 37 -90 print-anumbers
+    grestore
+    % 0 90 270 360 degree
+    font-big
+    -1  37 moveto   (0) show
+    35  -1 moveto  (90) show
+    -3 -35 moveto (180) show
+    -39  -1 moveto (270) show
+    -3  33 moveto (360) show
+} def
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% drawing starts here
+%
+
+% outer border: 12cm x 20cm
+200 120 draw-rectangle
+
+% left border scale 1:25000
+gsave
+    0 20 translate
+    draw-scale-25
+grestore
+
+% right border scale 1:50000
+gsave
+    120 180 translate
+    180 rotate
+    draw-scale-50
+grestore
+
+% top border 1cm scale
+gsave
+    0 200 translate
+    draw-scale-1cm
+grestore
+
+% GPS raster 1:25000
+gsave
+    15 50 translate
+    draw-raster
+grestore
+
+% lattice + angles circle
+gsave
+    15 95 translate
+    draw-goniometer
+grestore
+
+% Höhenlinienabstände (20 m) bei verschiedener Hangneigung
+gsave
+    15 35 translate
+    % 1:25000 (20m Höhenlinienabstand entspricht bei 1:25000 0.8mm)
+    [10 15 20 25 30 35 40 50 60] 10 60 0.8 draw-hoehenlinien
+    0 -20 translate
+    % 1:50000
+    [10 15 20 30 40] 10 45 0.4 draw-hoehenlinien
+grestore
+
+gsave
+    % 1:25000
+    15 27 translate  20 0.8 5 4 draw-hoehenlinie
+    20 0 translate   25 0.8 5 4 draw-hoehenlinie
+    19 0 translate   30 0.8 5 4 draw-hoehenlinie
+    17 0 translate   35 0.8 5 4 draw-hoehenlinie
+    15 0 translate   40 0.8 5 4 draw-hoehenlinie
+    % 1:50000
+    -28 -12 translate 20 0.4 5 4 draw-hoehenlinie
+     12   0 translate 25 0.4 5 4 draw-hoehenlinie
+     10   0 translate 30 0.4 5 4 draw-hoehenlinie
+      8   0 translate 35 0.4 5 4 draw-hoehenlinie
+      8   0 translate 40 0.4 5 4 draw-hoehenlinie
+grestore
