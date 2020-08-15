@@ -1,0 +1,91 @@
+%!
+
+% adjust coordinate system
+72 72 scale
+1 72 div setlinewidth
+4 5 translate
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% helper methods
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% draws a line 
+% Input: width w
+/line {
+  dup
+  newpath
+  0 0 moveto
+  1 exch 1 exch {
+    pop
+    0 height rlineto 
+    width height neg rmoveto
+  } for
+  0 add width mul 0 translate
+  stroke  
+} def
+
+% white lines
+/w {
+  1 setgray
+  line
+} def
+
+/b {
+  0 setgray
+  line
+} def
+
+/ean {
+  gsave
+    dup length 0 exch 1 exch 1 sub {
+               % array index
+      exch     % index array 
+      dup      % index array array
+      3 2 roll % array array index
+      get      % array array[index]
+      codes    % array array[index] codes
+      exch     % array codes array[index] 
+      get      % array codes[array[index]]
+
+      % draw four segments
+      aload pop
+      4 3 roll b
+      3 2 roll w
+          exch b
+               w      
+    } for
+  grestore
+} def
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% main 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/height 2 def
+/width 0.05 def
+
+width setlinewidth
+
+% only odd codes
+/codes [ 
+  [3 2 1 1] % 0
+  [2 2 2 1] % 1
+  [2 1 2 2] % 2
+  [1 4 1 1] % 3
+  [1 1 3 2] % 4
+  [1 2 3 1] % 5
+  [1 1 1 4] % 6
+  [1 3 1 2] % 7
+  [1 2 1 3] % 8
+  [3 1 1 2] % 9
+] def
+
+%[ 0 0 5 9 0 2 ] ean
+[ 6 4 4 3 1 0 ] ean
+
+
+
+showpage

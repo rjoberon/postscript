@@ -1,0 +1,140 @@
+%!PS-Adobe-2.0
+
+[
+(DENN)
+(SIE)
+(AHNTEN)
+(JA)
+(NICHT)
+(WAS)
+(IHNEN)
+(BEVORSTAND)
+]
+dup length /n exch def
+/width 2 def
+/fontsize 1 def
+
+gsave
+
+% initialize coordinate system
+72 72 scale
+1 72 div setlinewidth
+1 1 translate
+
+0 0 moveto
+
+% (re)set font
+/set-font {
+    /Arial findfont
+    exch scalefont
+    setfont
+} def
+/reset-font {
+    fontsize set-font
+} def
+reset-font
+
+%
+% before: width height
+/draw-rectangle {
+    newpath
+    0 0 moveto
+    dup 0 exch rlineto
+    exch dup 0 rlineto
+    exch -1 mul 0 exch rlineto
+    -1 mul 0 rlineto
+    closepath
+%    stroke
+} def
+
+%
+% before: (string)
+% pathbbox: llx lly urx ury
+% after: urx ury 
+/mystringwidth {
+    gsave
+    newpath
+    0 0 moveto
+    false charpath flattenpath pathbbox
+    grestore
+    % transform
+    % llx lly urx ury
+    % to
+    % urx ury |lly|
+    4 -1 roll
+    % lly urx ury llx
+    pop
+    % lly urx ury
+    3 -1 roll
+    % urx ury lly
+    abs
+    % urx ury |lly|
+} def
+
+
+
+% loop over array
+aload pop
+
+% y start value
+0
+
+%
+% TODO: Methode schreiben, welche
+% Wort vom Stack in Breite w an aktueller Position
+% schreibt und dann die beiden Hoehenwerte zurueckliefert
+%
+%
+%
+
+% loop over array
+n {
+    % STACK: eins zwei drei y
+    /y exch def
+    % STACK: eins zwei drei
+    % duplicate string
+    dup 
+    % STACK: eins zwei drei drei
+    % get size wx wy
+    mystringwidth
+    % STACK: eins zwei drei wx wy |lly|
+    y add 0 exch rmoveto
+    % STACK: eins zwei drei wx wy
+    pop
+    % STACK: eins zwei drei wx
+    dup /swidth exch def
+    % calculate new fontsize as fontsize_new = width/wx * fontsize
+    width exch div fontsize mul
+    % STACK: eins zwei drei fontsize_new
+    /fontsize_new exch def
+    % STACK: eins zwei drei 
+    fontsize_new set-font
+    % STACK: eins zwei drei 
+    % show text
+    dup show
+    % STACK: eins zwei drei
+    mystringwidth
+    % STACK: eins zwei wx wy |lly|
+    pop exch pop
+    % STACK: eins zwei wy
+    % add new font size to y
+    y add dup
+    % STACK: eins zwei y+fontsize_new y+fontsize_new
+    0 exch moveto
+    % STACK: eins zwei y+fontsize_new
+    % reset font
+    reset-font
+} repeat
+
+% draw box
+0 0 moveto
+0 7 lineto
+stroke
+width 0 moveto
+width 7 lineto
+stroke
+
+
+
+grestore
+%showpage
