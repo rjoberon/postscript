@@ -48,7 +48,7 @@ unit unit scale
 %                             | /   \ |
 %                             |/_____\|
 /drawcube {
-    1 dict begin
+    4 dict begin
         /col exch def        % colors
         /a exch def          % size (side length)
         /b a ratio mul def   % size of inner square
@@ -80,7 +80,7 @@ unit unit scale
 %        (length of short side  /___V_________\
 %         = width - 2height)          width
 /drawtrapeze {
-    1 dict begin
+    4 dict begin
         /height exch def
         /width exch def
         /color exch def
@@ -142,3 +142,4 @@ unit unit scale
 % start position
 10 260 translate
 drawcubes
+showpage
