@@ -1,4 +1,5 @@
 %!PS-Adobe-2.0
+%%Pages: 1
 
 % MacMahon's Cubes
 %
@@ -9,8 +10,8 @@
 % - initial version
 
 
-% set page size to A4 landscape
-<< /PageSize [842 595] >> setpagedevice
+% set page size to A4 portrait
+<< /PageSize [595 842] >> setpagedevice
 
 % define unit to be 1mm ((72 dots/inch) / (25.4 mm/inch))
 /unit 72 25.4 div def
@@ -140,7 +141,9 @@ unit unit scale
 } def
 
 
-% start position
-10 260 translate
+%%Page: 1 1
+gsave
+10 260 translate % start position
 drawcubes
+grestore
 showpage
