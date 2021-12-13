@@ -49,6 +49,7 @@ unit unit scale
 %                             | |_b_| |a
 %                             | /   \ |
 %                             |/_____\|
+%                            O
 /drawcube {
     4 dict begin
         /col exch def        % colors
@@ -80,7 +81,7 @@ unit unit scale
 % input: color width height       / ^       \
 %                                /  | height \
 %        (length of short side  /___V_________\
-%         = width - 2height)          width
+%         = width - 2height)   O       width
 /drawtrapeze {
     4 dict begin
         /height exch def
@@ -118,7 +119,7 @@ unit unit scale
 %
 /drawcubes {
     gsave
-        0 1 5 {            % row
+        5 -1 0 {           % row
             cubes exch get % cubes[row]
             gsave
             0 1 5 {        % cubes[row] col
@@ -135,7 +136,7 @@ unit unit scale
                 cubesize gap add 0 translate % next column
             } for
             grestore
-            0 cubesize gap add neg translate % next row
+            0 cubesize gap add translate % next row
         } for
     grestore
 } def
@@ -143,7 +144,21 @@ unit unit scale
 
 %%Page: 1 1
 gsave
-10 260 translate % start position
+% compute start position for A4 paper (210mm × 297mm)
+% horizontal: (210mm - width) / 2 = (210 - (6*cubesize + 5*gap)) / 2
+210 6 cubesize mul 5 gap mul add sub 2 div
+% vertical: (297mm - height) / 2 = (297 - (6*cubesize + 5*gap)) / 2
+297 6 cubesize mul 5 gap mul add sub 2 div
+% set start position
+translate
 drawcubes
 grestore
+% page title
+/Helvetica findfont 16.5 scalefont setfont
+(MacMahon's Cubes) dup % (MacMahon's Cubes) (MacMahon's Cubes)
+stringwidth            % (MacMahon's Cubes) width height
+pop                    % (MacMahon's Cubes) width
+210 exch sub 2 div     % (MacMahon's Cubes) xpos
+240 moveto             % (MacMahon's Cubes)
+show
 showpage
