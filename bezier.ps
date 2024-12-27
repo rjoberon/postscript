@@ -1,10 +1,8 @@
-%!
+%!PS-Adobe-2.0
 
-% drawing parametrized two dimensional curves using cubic splines
 %
+% Drawing parametrized two-dimensional curves using cubic splines.
 %
-%
-
 
 /squaresize 5 72 div def
 /pi 3.1415926 def
@@ -23,15 +21,15 @@
 % Input: size
 /square {
     1 dict begin
-	newpath
-	moveto
-	/a exch def
-	a 2 div dup rmoveto
-	0 a neg rlineto
-	a neg 0 rlineto
-	0 a rlineto
-	closepath
-	fill
+        newpath
+        moveto
+        /a exch def
+        a 2 div dup rmoveto
+        0 a neg rlineto
+        a neg 0 rlineto
+        0 a rlineto
+        closepath
+        fill
     end
 } def
 
@@ -56,7 +54,7 @@
   1 dict begin
     /size exch def
     /nsize size -1 mul def
-    
+
     % thin lines
     0.9 setgray
     nsize 1 size {
@@ -66,11 +64,11 @@
       % vertical
       zaehler nsize moveto zaehler size lineto stroke
     } for
-    
+
     % x- and y-axis
     0.7 setgray
-    nsize 0 moveto size 0 lineto stroke 
-    0 nsize moveto 0 size lineto stroke 
+    nsize 0 moveto size 0 lineto stroke
+    0 nsize moveto 0 size lineto stroke
   end
 } def
 
@@ -78,15 +76,15 @@
 % prepares helper points for spline
 % given:  f(t) = (fx,fy), f'(t) = (dfx,dfy), delta
 % Input:  fx fy            dfx            dfy delta
-% Output: fx fy fx+delta/3*dfx fy+delta/3*dfy 
+% Output: fx fy fx+delta/3*dfx fy+delta/3*dfy
 /diff {
   1 dict begin
     3 div /delta exch def
     /dfy exch def
     /dfx exch def
-    2 copy             % stack: fx fy fx fy 
+    2 copy             % stack: fx fy fx fy
     delta dfy mul add  % stack: fx fy fx (fy+delta/3*dfy)
-    exch               
+    exch
     delta dfx mul add  % stack: fx fy (fy+delta/3*dfy) (fx+delta/3+dfy)
     exch
   end
@@ -123,7 +121,7 @@
     squaresize P2x P2y square
     squaresize P3x P3y square
     squaresize P4x P4y square
-    
+
     % draw bezier curve
     0 setgray
     P1x P1y moveto
@@ -139,55 +137,56 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% x�
+% x²
 % Input: t
 % Output: x, y, x', y'
-%         t  t� 1   2t
+%         t  t² 1   2t
 /fsqr {
   /t exch def
-  t 
-  t t mul 
-  1 
+  t
+  t t mul
+  1
   2 t mul
 } def
 
-% x^4
+% x³
 % Input: t
-% Output: x, y,   x', y'
-%         t  t^4  1   4t^3
-/f4 {
-  /t exch def
-  t 
-  t t mul dup mul
-  1 
-  4 t t t mul mul mul
-} def
-
-% x^5
-% Input: t
-% Output: x, y,   x', y'
-%         t  t^5  1   5t^4
-/f5 {
-  /t exch def
-  t 
-  t t mul dup mul t mul
-  1 
-  5 t t t mul mul mul t mul
-} def
-
-% x^3
-% Input: t
-% Output: x, y,   x', y'
-%         t  t^3  1   3t^2
+% Output: x, y, x', y'
+%         t  t³ 1   3t²
 /fk {
   1 dict begin
     /t exch def
-    t 
+    t
     t t t mul mul
-    1 
+    1
     3 t t mul mul
   end
 } def
+
+% x⁴
+% Input: t
+% Output: x, y, x', y'
+%         t  t⁴ 1   4t³
+/f4 {
+  /t exch def
+  t
+  t t mul dup mul
+  1
+  4 t t t mul mul mul
+} def
+
+% x⁵
+% Input: t
+% Output: x, y, x', y'
+%         t  t⁵ 1   5t⁴
+/f5 {
+  /t exch def
+  t
+  t t mul dup mul t mul
+  1
+  5 t t t mul mul mul t mul
+} def
+
 
 % circle around origin
 % Input:  t
@@ -216,8 +215,8 @@
     /r 0.1 def    % radius
     r t rcos mul t mul
     r t rsin mul t mul
-    r -1 mul t rsin mul t mul t rcos r mul add 
-    r  1 mul t rcos mul t mul t rsin r mul add 
+    r -1 mul t rsin mul t mul t rcos r mul add
+    r  1 mul t rcos mul t mul t rsin r mul add
   end
 } def
 
@@ -225,17 +224,15 @@
 % sin
 /fs {
   1 dict begin
-    /t exch def 
-    t 
+    /t exch def
+    t
     t ssin
     1
-    t scos 
+    t scos
   end
 } def
 
-
-
-% sin x, x^2
+% sin x, x²
 /fsin {
   1 dict begin
     /t exch def
@@ -246,7 +243,7 @@
   end
 } def
 
-% cos x, x^2
+% cos x, x²
 /fcos {
   1 dict begin
     /t exch def
@@ -260,7 +257,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% main 
+% main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % draw coordinate system
