@@ -34,18 +34,21 @@ unit unit scale
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % functions
 
+%
 % draw a square of size a at the current position
-% input a
+%
+% input: a
+%
 /square {
     1 dict begin
-	/a exch def
-	%    newpath
-	a 0 rmoveto
-	0 a neg rlineto
-	a neg 0 rlineto
-	0 a rlineto
-	closepath
-	fill
+    /a exch def
+    %    newpath
+    a 0 rmoveto
+    0 a neg rlineto
+    a neg 0 rlineto
+    0 a rlineto
+    closepath
+    fill
     end
 } def
 
@@ -54,24 +57,27 @@ unit unit scale
     rand 16#7fffffff div
 } def
 
+%
 % get a random color
+%
 % input: spread
 % output: r g b (each a random value between 0 and 1)
+%
 /rcolor {
     1 dict begin
     {
-	/r rfloat def
-	/g rfloat def
-	/b rfloat def
-	% compare sum
-	r g b add add
-	% larger than csummin
-	csummin gt
-	% one of the pair-wise distances large enough
-	r g sub abs cpwdist gt
-	g b sub abs cpwdist gt or
-	b r sub abs cpwdist gt or
-	and {exit} if
+        /r rfloat def
+        /g rfloat def
+        /b rfloat def
+        % compare sum
+        r g b add add
+        % larger than csummin
+        csummin gt
+        % one of the pair-wise distances large enough
+        r g sub abs cpwdist gt
+        g b sub abs cpwdist gt or
+        b r sub abs cpwdist gt or
+        and {exit} if
     } loop
     r g b
     end
@@ -85,12 +91,12 @@ unit unit scale
     /x exch def
     % vertical loop
     0 squaresize vmax {
-	/y exch def
-	% move to point
-	x y moveto
-	% select color
-	rcolor setrgbcolor
-	% draw square
-	squaresize square
+        /y exch def
+        % move to point
+        x y moveto
+        % select color
+        rcolor setrgbcolor
+        % draw square
+        squaresize square
     } for
 } for

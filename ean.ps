@@ -1,4 +1,8 @@
-%!
+%!PS-Adobe-2.0
+
+%
+% Draws an EAN (European Article Number) barcode.
+%
 
 % adjust coordinate system
 72 72 scale
@@ -10,20 +14,22 @@
 % helper methods
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-% draws a line 
-% Input: width w
+%
+% draws a line
+%
+% input: width w
+%
 /line {
   dup
   newpath
   0 0 moveto
   1 exch 1 exch {
     pop
-    0 height rlineto 
+    0 height rlineto
     width height neg rmoveto
   } for
   0 add width mul 0 translate
-  stroke  
+  stroke
 } def
 
 % white lines
@@ -41,12 +47,12 @@
   gsave
     dup length 0 exch 1 exch 1 sub {
                % array index
-      exch     % index array 
+      exch     % index array
       dup      % index array array
       3 2 roll % array array index
       get      % array array[index]
       codes    % array array[index] codes
-      exch     % array codes array[index] 
+      exch     % array codes array[index]
       get      % array codes[array[index]]
 
       % draw four segments
@@ -54,14 +60,14 @@
       4 3 roll b
       3 2 roll w
           exch b
-               w      
+               w
     } for
   grestore
 } def
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% main 
+% main
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /height 2 def
@@ -70,7 +76,7 @@
 width setlinewidth
 
 % only odd codes
-/codes [ 
+/codes [
   [3 2 1 1] % 0
   [2 2 2 1] % 1
   [2 1 2 2] % 2
@@ -85,7 +91,5 @@ width setlinewidth
 
 %[ 0 0 5 9 0 2 ] ean
 [ 6 4 4 3 1 0 ] ean
-
-
 
 showpage

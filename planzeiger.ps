@@ -10,11 +10,11 @@
 2.8346456692 2.8346456692 scale
 10 10 translate
 
-% Standard-Linienbreite: 1/4 mm
+% standard line width: 1/4 mm
 /lw 0.25 def
 lw setlinewidth
 
-% Schriftdefinitionen
+% font definitions
 /font-big    {/Helvetica findfont 4 scalefont setfont} def
 /font-normal {/Helvetica findfont 3 scalefont setfont} def
 /font-small  {/Helvetica findfont 2 scalefont setfont} def
@@ -22,8 +22,11 @@ font-normal
 
 %
 % draws a rectangle with the given side lengths
-% w h
+%
+% input: w h
+%
 /draw-rectangle {
+    2 dict begin
     /w exch def
     /h exch def
     newpath
@@ -33,16 +36,19 @@ font-normal
     w neg 0 rlineto
     closepath
     stroke
+    end
 } def
 
 %
 % draws several parallel lines
+%
 % input:
 %   k: number of lines
 %   l: length of lines
 %   d: distance between lines
 %
 /draw-hparallels {
+    3 dict begin
     /d exch def  % distance
     /l exch def  % length
     /k exch def  % number of lines
@@ -50,14 +56,16 @@ font-normal
     newpath
     l d neg moveto	% initial position
     0 1 k {		% i
-	pop		% (i is unused)
-	l neg d rmoveto % move to upper left \
-	l 0 rlineto     % line to the right
+        pop		% (i is unused)
+        l neg d rmoveto % move to upper left \
+        l 0 rlineto     % line to the right
     } for
     stroke
+    end
 } def
 % see doc for draw-hparallels
 /draw-vparallels{
+    3 dict begin
     /d exch def  % distance
     /l exch def  % length
     /k exch def  % number of lines
@@ -65,78 +73,95 @@ font-normal
     newpath
     d neg l moveto	% initial position
     1 1 k {		% i
-	pop		% (i is unused)
-	d l neg rmoveto % move to upper left \
-	0 l rlineto     % line to the right
+        pop		% (i is unused)
+        d l neg rmoveto % move to upper left \
+        0 l rlineto     % line to the right
     } for
     stroke
+    end
 } def
 
-
-% start inc end distance suffix prefix
+%
+% input: start inc end distance suffix prefix
+%
 /print-hnumbers {
+    3 dict begin
     /suf exch def
     /pre exch def
     /dist exch def
     {
-	dist 0 rmoveto
-	% we use gsave & grestore to not alter our
-	% position by printing the characters
-	gsave
-	    % TODO: estimate width of string and then
-	    %       center at position
-	    pre show (   ) cvs show suf show
-	grestore
+        dist 0 rmoveto
+        % we use gsave & grestore to not alter our
+        % position by printing the characters
+        gsave
+            % TODO: estimate width of string and then
+            %       center at position
+            pre show (   ) cvs show suf show
+        grestore
     } for
+    end
 } def
 
-% start inc end distance suffix prefix
+%
+% input: start inc end distance suffix prefix
+%
 /print-vnumbers {
+    3 dict begin
     /suf exch def
     /pre exch def
     /dist exch def
     {
-	0 dist rmoveto
-	gsave
-	    pre show (   ) cvs show suf show
-	grestore
+        0 dist rmoveto
+        gsave
+            pre show (   ) cvs show suf show
+        grestore
     } for
+    end
 } def
 
+%
 % prints numbers for angles
-% start end distance r rot
+%
+% input: start end distance r rot
+%
 /print-anumbers {
+    3 dict begin
     /rot exch def
     /r exch def
     dup /dist exch def
     gsave
     exch {
-	dist neg rotate
-	gsave
-	r 0 translate
-	rot rotate
-	-2 0 moveto
-	(   ) cvs show
-	grestore
+        dist neg rotate
+        gsave
+        r 0 translate
+        rot rotate
+        -2 0 moveto
+        (   ) cvs show
+        grestore
     } for
     grestore
+    end
 } def
 
-
+%
+%
+%
 /draw-angles {		% r1 r2 angle
+    3 dict begin
     /angle exch def	% r1 r2
     /r2 exch def	% r1
     /r1 exch def
     gsave
     newpath
     0 angle 360 {	% alpha
-	pop
-	angle rotate
-	0 r1 moveto
-	0 r2 lineto
+        pop
+        angle rotate
+        0 r1 moveto
+        0 r2 lineto
     } for
     stroke
     grestore
+    end
 } def
 
 
@@ -145,7 +170,9 @@ font-normal
 % and b. The center of the circle is at position (x,y)
 %
 % input: r x y a b
-/draw-rectcircle {
+%
+/draw-rectcircle {       % r x y a b
+    5 dict begin
     /b exch def
     /a exch def
     /y exch def
@@ -153,14 +180,15 @@ font-normal
     /r exch def
     newpath
     a y moveto
-    x r add y lineto	% line to circle
-    x y r 0 360 arc	% outer circle
-    a y lineto		% line to outside
-    a 0 lineto		% square around circles
+    x r add y lineto	 % line to circle
+    x y r 0 360 arc	 % outer circle
+    a y lineto		 % line to outside
+    a 0 lineto		 % square around circles
     0 0 lineto
     0 b lineto
     a b lineto
     closepath
+    end
 } def
 
 %
@@ -171,111 +199,120 @@ font-normal
 %
 % leaves x position of last drawn line on stack
 %
-% array start inc end dist length
-/draw-neigung {		% a start inc end dist length
-    /l exch def		% a start inc end dist
-    /dist exch def	% a start inc end
-    /e exch def		% a start inc
-    /inc exch def	% a start
-    /s exch def		% a
-    0			% a 0
-    newpath		% a 0
-    0 0 moveto		% a 0
-    s 1 e {		% a 0 neig
-	dup		% a 0 neig neig
-	dist		% a 0 neig neig dist
-	calc-dist-neigung % a 0 neig s
-	3 -1 roll add	% a neig s
-	exch		% a s neig
-	dup		% a s neig neig
-	% if neig mod inc == 0, then draw neigung
-	inc mod		% a s neig (neig mod inc)
-	0 eq		% a s neig (neig mod inc == 0)
-	{		% a s neig
-	    % draw line
-	    0 l rlineto
-	    % print angle
-	    dup		% a s neig neig
-	    4 -1 roll	% s neig neig a
-	    if-pop-array
-	    {		% s neig a
-		3 1 roll% a s neig
-		gsave
-		    -1 1.7 rmoveto
-		    (   ) cvs show /degree glyphshow % show text
-		grestore
-	    } {
-		3 1 roll
-		pop
-	    } ifelse
-	} {pop} ifelse
-	dup		% a s s
-	0 moveto	% a s
-    } for		% a s
-    stroke		% a s
-    exch pop		% s
+% input: array start inc end dist length
+%
+/draw-neigung {		 % a start inc end dist length
+    5 dict begin
+    /l exch def		 % a start inc end dist
+    /dist exch def	 % a start inc end
+    /e exch def		 % a start inc
+    /inc exch def	 % a start
+    /s exch def		 % a
+    0			 % a 0
+    newpath		 % a 0
+    0 0 moveto		 % a 0
+    s 1 e {		 % a 0 neig
+        dup		 % a 0 neig neig
+        dist		 % a 0 neig neig dist
+        calc-dist-neigung % a 0 neig s
+        3 -1 roll add	 % a neig s
+        exch		 % a s neig
+        dup		 % a s neig neig
+        % if neig mod inc == 0, then draw neigung
+        inc mod		 % a s neig (neig mod inc)
+        0 eq		 % a s neig (neig mod inc == 0)
+        {		 % a s neig
+            % draw line
+            0 l rlineto
+            % print angle
+            dup		 % a s neig neig
+            4 -1 roll	 % s neig neig a
+            if-pop-array
+            {		 % s neig a
+                3 1 roll % a s neig
+                gsave
+                    -1 1.7 rmoveto
+                    (   ) cvs show /degree glyphshow % show text
+                grestore
+            } {
+                3 1 roll
+                pop
+            } ifelse
+        } {pop} ifelse
+        dup		 % a s s
+        0 moveto	 % a s
+    } for		 % a s
+    stroke		 % a s
+    exch pop		 % s
     % leave x position of last line on stack
     % subtract last distance from s ...
     e dist calc-dist-neigung	% s se
     sub				% s - se
+    end
 } def
 
 %
 % Höhenlinien für feste Neigung
 %
+% input: neig dist number length
 %
-% neig dist number length
-/draw-hoehenlinie {	% neig dist number l
+/draw-hoehenlinie {	 % neig dist number l
+    2 dict begin
     lw 2 div setlinewidth
-    /l exch def		% neig dist number
-    3 2 roll		% dist number neig
-    dup			% dist number neig neig
-    4 -1 roll		% number neig neig dist
-    calc-dist-neigung	% number neig s
-    /s exch def		% number neig
-    0 1			% number neig 1 1
-    4 -1 roll		% neig 1 1 number
+    /l exch def		 % neig dist number
+    3 2 roll		 % dist number neig
+    dup			 % dist number neig neig
+    4 -1 roll		 % number neig neig dist
+    calc-dist-neigung	 % number neig s
+    /s exch def		 % number neig
+    0 1			 % number neig 1 1
+    4 -1 roll		 % neig 1 1 number
     newpath
     s neg 0 moveto
-    {			% neig
-	s mul 0 moveto
-	0 l rlineto
+    {			 % neig
+        s mul 0 moveto
+        0 l rlineto
     } for
     1 -2.5 rmoveto
     font-small
     (   ) cvs show /degree glyphshow
     stroke
+    end
 } def
 %
 % tan(x) = sin(x) / cos(x)
 %
 % x
 %
-/tan {		% x
-    dup		% x
-    sin		% x sin(x)
-    exch	% sin(x) x
-    cos		% sin(x) cos(x)
-    div		% sin(x) / cos(x)
-} def
-
-% winkel dist
-/calc-dist-neigung {	% winkel dist
-    exch		% dist winkel
-    tan			% dist tan(winkel)
-    div			% dist / tan(winkel)
+/tan {                   % x
+    dup                  % x
+    sin                  % x sin(x)
+    exch                 % sin(x) x
+    cos                  % sin(x) cos(x)
+    div                  % sin(x) / cos(x)
 } def
 
 %
-% numbers: array with Beschriftungen which should be printed
+% input: winkel dist
 %
-% numbers start end dist
+/calc-dist-neigung {	 % winkel dist
+    exch		 % dist winkel
+    tan			 % dist tan(winkel)
+    div			 % dist / tan(winkel)
+} def
+
+%
+% numbers: array with labels that should be printed
+%
+% input: numbers start end dist
+%
 /draw-hoehenlinien {
-    gsave
-    font-small
+    3 dict begin
     /dist exch def
     /e exch def
     /s exch def
+    gsave
+    font-small
     lw 2 div setlinewidth
     [] s  1 e dist 4 draw-neigung pop	%  1°
     lw setlinewidth
@@ -284,6 +321,7 @@ font-normal
     % draw horizontal line using last x position on stack
     4 moveto 0 4 lineto stroke
     grestore
+    end
 } def
 
 %
@@ -292,35 +330,37 @@ font-normal
 %
 % t = a1 == i
 % if t == true, then a1 is removed
-/if-pop-array {	% i []
+/if-pop-array {          % i []
     % check length of array
-    dup		% i [] []
-    length	% i [] l
-    0 gt	% i [] l>0
+    dup                  % i [] []
+    length               % i [] l
+    0 gt                 % i [] l>0
     {
-	dup
-	% compare first element of array with i
-	0 get	% i [] a1
-	3 -1 roll	% [] a1 i
-	eq		% [] a1==i
-	dup		% [] a1==i a1==i
-	{		% [] a1==i
-	    exch	% a1==i []
-	    array-pop
-	    exch
-	} if	% [] a1==i
-    } {		% i []
-	exch pop false
+        dup
+        % compare first element of array with i
+        0 get            % i [] a1
+        3 -1 roll	 % [] a1 i
+        eq		 % [] a1==i
+        dup		 % [] a1==i a1==i
+        {		 % [] a1==i
+            exch	 % a1==i []
+            array-pop
+            exch
+        } if             % [] a1==i
+    } {                  % i []
+        exch pop false
     } ifelse
 } def
 
+%
 % removes the first element from the given array
-/array-pop {		% []
-    dup			% [] []
-    length		% [] l
-    1 sub		% [] (l-1)
-    1 exch		% [] 1 (l-1)
-    getinterval		% []
+%
+/array-pop {		 % []
+    dup			 % [] []
+    length		 % [] l
+    1 sub		 % [] (l-1)
+    1 exch		 % [] 1 (l-1)
+    getinterval		 % []
 } def
 
 
@@ -341,6 +381,7 @@ font-normal
 
 % [s1 s2 s3] length
 /draw-scale {
+    1 dict begin
     /le exch def
     aload pop
     lw 2 div setlinewidth
@@ -348,6 +389,7 @@ font-normal
     dup le exch idiv 4 3 -1 roll draw-hparallels
     lw setlinewidth
     dup le exch idiv 4 3 -1 roll draw-hparallels
+    end
 } def
 
 /draw-scale-50 {
@@ -393,32 +435,32 @@ font-normal
 /draw-goniometer {
     % inner lattice
     gsave
-	45 50 36 0 360 arc clip
-	10 10 translate
-	9 70 10 draw-hparallels
-	15 80 5 draw-vparallels
-	% small scales
-	10 20 translate
-	50 -1.5 1 draw-vparallels
-	40 -1.5 1 draw-hparallels
-	0 40 translate
-	50 1.5 1 draw-vparallels
-	50 -40 translate
-	40 1.5 1 draw-hparallels
-	% dicke Linien
-	lw 2 mul setlinewidth
-	-25 20 translate
-	-30 0 moveto 30 0 lineto
-	0 -30 moveto 0 30 lineto
-	stroke
+        45 50 36 0 360 arc clip
+        10 10 translate
+        9 70 10 draw-hparallels
+        15 80 5 draw-vparallels
+        % small scales
+        10 20 translate
+        50 -1.5 1 draw-vparallels
+        40 -1.5 1 draw-hparallels
+        0 40 translate
+        50 1.5 1 draw-vparallels
+        50 -40 translate
+        40 1.5 1 draw-hparallels
+        % dicke Linien
+        lw 2 mul setlinewidth
+        -25 20 translate
+        -30 0 moveto 30 0 lineto
+        0 -30 moveto 0 30 lineto
+        stroke
     grestore
     % outer lattice
     gsave
-	0 2 translate
-	45 45 48 90 95 draw-rectcircle clip
-	19 93 5 draw-vparallels
-	0 .5 translate
-	90 1.5 1 draw-vparallels
+        0 2 translate
+        45 45 48 90 95 draw-rectcircle clip
+        19 93 5 draw-vparallels
+        0 .5 translate
+        90 1.5 1 draw-vparallels
     grestore
     % angles circle
     45 50 translate
@@ -430,10 +472,10 @@ font-normal
     % angle numbers
     % start end distance r rot voffset hoffset
     gsave
-	 90 rotate  10  80 10 37 -90 print-anumbers
-	-90 rotate 100 170 10 39  90 print-anumbers
-	-90 rotate 190 260 10 39  90 print-anumbers
-	-90 rotate 280 350 10 37 -90 print-anumbers
+         90 rotate  10  80 10 37 -90 print-anumbers
+        -90 rotate 100 170 10 39  90 print-anumbers
+        -90 rotate 190 260 10 39  90 print-anumbers
+        -90 rotate 280 350 10 37 -90 print-anumbers
     grestore
     % 0 90 270 360 degree
     font-big
