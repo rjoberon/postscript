@@ -1,4 +1,4 @@
-a small collection of examples (more for learning programming than for viewing)
+A small collection of examples (more for learning programming than for viewing).
 
 - <file:bezier.ps>
 - <file:color.ps>
@@ -13,3 +13,5 @@ a small collection of examples (more for learning programming than for viewing)
 - <file:spirale.ps>
 - <file:triangle.ps>
 - <file:voronoi.ps>
+
+All code is licensed with [GNU General Public License Version 3](file:LICENSE).
