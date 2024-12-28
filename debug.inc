@@ -1,7 +1,7 @@
 /log-stack {              % fname
-    (\n### ) print
+    (\n) print
     print
-    ( ###\n) print
+    ( ) print
     print-stack
     %pstack
 } def
@@ -26,7 +26,7 @@
 /ppitem {                % item
 %    (| ) print
     dup type exec
-    (\n) print
+    ( ---- ) print
 } def
 
 /nametype    { (/) print (         ) cvs print } def
@@ -34,7 +34,7 @@
 /nulltype    { (null) print pop } def
 /integertype { (    ) cvs print } def
 /booleantype { (     ) cvs print } def
-/realtype    { (        ) cvs print } def
+/realtype    { (         ) cvs print } def
 /arraytype {             % arr
     1 dict begin
     /arraytype {

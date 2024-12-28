@@ -112,6 +112,7 @@ lw setlinewidth
 /circle-events [ [] ] def
 % FIXME: generalize for other objects (i.e., voronoi edges)
 /circle-events-append {  % cevent
+    (<circle-events-append>) log-stack
     [ exch ]             % [cevent]
     circle-events 0 get  % [cevent] [...]
     exch                 % [...] [cevent]
@@ -188,6 +189,7 @@ lw setlinewidth
 /voronoi-edge-set-point2   {1 exch put} def
 /voronoi-edge-set-finished {2 exch put} def
 /voronoi-edge-finish {   % vedge point
+    (<voronoi-edge-finish>) log-stack
     exch dup             % point vedge vedge
     voronoi-edge-is-finished
     not                  % point vedge !is_finished
@@ -204,9 +206,7 @@ lw setlinewidth
 /voronoi-edges-append {  % vedge
     (\nADD EDGE:) print
     dup voronoi-edge-get-point1 ppitem
-    ( ) print
     dup voronoi-edge-get-point2 ppitem
-    (\n) print
 
     [ exch ]             % [vedge]
     voronoi-edges 0 get  % [vedge] [...]
@@ -255,24 +255,23 @@ lw setlinewidth
         { % len(fortune.circle_events) > 0
             0 circle-events-get
             circle-event-get-x
-            1 index 0 get% cevents[0].x [px py]
+            1 index      % cevents[0].x [px py]
             0 get le     % cevents[0].x <= px
-            { % fortune.circle_events[0].x <= fortune.points[0].x
-                process-circle-event
-            } {
-                x1 process-point
-            } ifelse
+        } {
+            false
+        } ifelse
+        { % fortune.circle_events[0].x <= fortune.points[0].x
+            process-circle-event
         } {
             x1 process-point
         } ifelse
-        (</fortune loop>) log-stack
+        % (\n</fortune loop>\n) print
     } loop
 
     % after all points are processed, finish remaining circle events
-    % FIXME: TODO process circle events
     {
-        (\n<diese Aufraeum-Schleife am Ende>\n) print
         circle-events-len
+        (<diese Aufraeum-Schleife am Ende>) log-stack
         0 le { exit } if
         process-circle-event
     } loop
@@ -289,6 +288,7 @@ lw setlinewidth
 % no output
 %
 /process-point {         % pn ... p1 p0 x
+    (<process-point>) log-stack
     add-new-arc          % pn ... p1
 } def
 
@@ -299,7 +299,7 @@ lw setlinewidth
 % no output
 %
 /process-circle-event {
-    ( process-circle-event ) log-stack
+    (<process-circle-event>) log-stack
     3 dict begin
     /cevent circle-events-pop def
 
@@ -357,7 +357,7 @@ lw setlinewidth
             cevent circle-event-get-x
             check-circle-event
         } if
-        arc parabola-arc-get-previous null ne
+        arc parabola-arc-get-next null ne
         {
             % self.check_circle_event(arc.next_arc, circle_event.x)
             arc parabola-arc-get-next
@@ -394,8 +394,6 @@ lw setlinewidth
         /arc root-get def
         % while arc is not None:
         {
-            (\nLOOP START\n) print
-
             arc null eq {% exit when arc is null
                 true exit% proceed after loop
             } if
@@ -405,7 +403,6 @@ lw setlinewidth
                 % if arc.next_arc is not None and
                 %    not self.get_intersection(point, arc.next_arc):
                 arc parabola-arc-get-next
-                (\n##### next #####\n) print
                 null ne  % [i1x i1y] !=
                 dup      % [i1x i1y] != !=
                 {        % [i1x i1y] !=
@@ -464,11 +461,11 @@ lw setlinewidth
                 % arc = arc.next_arc
                 /arc arc parabola-arc-get-next def
                 % FIXME: log-stack
-                arc 0 get% [px py]
-                aload pop% px py
-                exch     % py px
-                (\nARC px = ) print (        ) cvs print
-                (\nARC py = ) print (        ) cvs print (\n) print
+                %arc 0 get% [px py]
+                %aload pop% px py
+                %exch     % py px
+                %(\nARC px = ) print (        ) cvs print
+                %(\nARC py = ) print (        ) cvs print (\n) print
 
                 % connect two new edges with the endpoints of the parabola arc
                 % arc.edge1 = VoronoiEdge(intersection1)
@@ -498,9 +495,9 @@ lw setlinewidth
                 arc                           px check-circle-event
                 arc parabola-arc-get-previous px check-circle-event
                 arc parabola-arc-get-next     px check-circle-event
+                (\nDONE HERE\n) print
                 false exit% finish after loop
             } if
-            /arc arc parabola-arc-get-next def
         } loop
         {   % proceed after loop?
             %
@@ -538,7 +535,7 @@ lw setlinewidth
         } if
     } ifelse
     end
-    (\n</add-new-arc>\n) print
+    % (\n</add-new-arc>\n) print
 } def
 
 %
@@ -579,10 +576,14 @@ lw setlinewidth
     null ne
     and
     {
-        (---- HIER DRINNEN ---------------------------------------\n) print
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
+        % FIXME: hier weiter suchen; Problem ist: die drei Eingabe-Punkte in voronoi.ps sind:
+        % P1: [12.985 40.466 ], P2: [13.757 63.445 ], P3: [17.828 14.802 ]
+        % in voronoi.py sind sie jedoch
+        % P1: [178.28, 148.02], P2: [129.85, 404.66], P3: [137.57, 634.45]
+        % die Reihenfolge stimmt also nicht! :-(
         get-rightmost-circle-point
         {                % [px py] x
             dup x        % [px py] x x _x
@@ -602,7 +603,7 @@ lw setlinewidth
     } if
     end
 
-    (\n</check-circle-event>\n) print
+%    (\n</check-circle-event>\n) print
 } def
 
 % Given three points, check whether they are all on one line. If not,
@@ -790,7 +791,7 @@ lw setlinewidth
     } ifelse
 
     end
-    (\n</get-intersection>\n) print
+    % (\n</get-intersection>\n) print
 } def
 
 %
@@ -880,7 +881,7 @@ lw setlinewidth
     div                   % (px² + (py - iy)² - x²) / (2 * (px - x))
     [ exch iy ]
     end
-    (\n</get-parabolas-intersection>\n) print
+%    (\n</get-parabolas-intersection>\n) print
 } def
 
 %
