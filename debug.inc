@@ -34,7 +34,7 @@
 /nulltype    { (null) print pop } def
 /integertype { (    ) cvs print } def
 /booleantype { (     ) cvs print } def
-/realtype    { (       ) cvs print } def
+/realtype    { (        ) cvs print } def
 /arraytype {             % arr
     1 dict begin
     /arraytype {

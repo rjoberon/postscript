@@ -37,8 +37,8 @@ lw setlinewidth
 } def
 
 % draw an edge from (x1, y1) to (x2, y2)
-/draw-edge {             % [[x1 y1] [x2 y2]]
-    aload pop            % [x1 y1] [x2 y2]
+/draw-vedge {             % [[x1 y1] [x2 y2] true]
+    aload pop pop         % [x1 y1] [x2 y2]
     gsave
         2 1 roll         % [x2 y2] [x1 y1]
         aload pop        % [x2 y2] x1 y1
@@ -155,10 +155,10 @@ lw setlinewidth
     % [point previous_arc next_arc circle_event edge1 edge2]
 } def
 % Getter for parabola arc. Input: parabolaarc
-/parabola-arc-get-point    {(pag-point) log-stack 0 get} def
-/parabola-arc-get-previous {(pag-previous) log-stack 1 get} def
-/parabola-arc-get-next     {(pag-next) log-stack 2 get} def
-/parabola-arc-get-cevent   {(pag-cevent) log-stack 3 get} def
+/parabola-arc-get-point    {0 get} def
+/parabola-arc-get-previous {1 get} def
+/parabola-arc-get-next     {2 get} def
+/parabola-arc-get-cevent   {3 get} def
 /parabola-arc-get-edge1    {4 get} def
 /parabola-arc-get-edge2    {5 get} def
 % Setter for parabola arc. Input: parabolaarc value
@@ -180,7 +180,9 @@ lw setlinewidth
     dup voronoi-edges-append
 } def
 % Getter for voronoi edge. Input: vedge
-/voronoi-edge-is_finished {2 get} def
+/voronoi-edge-get-point1   {0 get} def
+/voronoi-edge-get-point2   {1 get } def
+/voronoi-edge-is-finished  {2 get} def
 % Setter for voronoi edge. Input: vedge value
 /voronoi-edge-set-point1   {0 exch put} def
 /voronoi-edge-set-point2   {1 exch put} def
@@ -200,6 +202,12 @@ lw setlinewidth
 /voronoi-edges [ [] ] def
 % FIXME: generalize for other objects (i.e., voronoi edges)
 /voronoi-edges-append {  % vedge
+    (\nADD EDGE:) print
+    dup voronoi-edge-get-point1 ppitem
+    ( ) print
+    dup voronoi-edge-get-point2 ppitem
+    (\n) print
+
     [ exch ]             % [vedge]
     voronoi-edges 0 get  % [vedge] [...]
     exch                 % [...] [vedge]
@@ -262,7 +270,15 @@ lw setlinewidth
 
     % after all points are processed, finish remaining circle events
     % FIXME: TODO process circle events
+    {
+        (\n<diese Aufraeum-Schleife am Ende>\n) print
+        circle-events-len
+        0 le { exit } if
+        process-circle-event
+    } loop
 
+    x1 y1 x2 y2 finish-edges
+    pop % remove -mark-
     end
 } def
 
@@ -392,13 +408,16 @@ lw setlinewidth
                 (\n##### next #####\n) print
                 null ne  % [i1x i1y] !=
                 dup      % [i1x i1y] != !=
-                {
+                {        % [i1x i1y] !=
                     [px py]  % [i1x i1y] != [px py]
                     arc parabola-arc-get-next
                     get-intersection
-                    not  % [i1x i1y] != [i2x i2y] !=
-                    exch % [i1x i1y] != != [i2x i2y]
-                    pop  % [i1x i1y] != !=
+                    {        % [i1x i1y] != [i2x i2y]
+                        pop  % [i1x i1y] !=
+                        false% [i1x i1y] != false
+                    } {
+                        true % [i1x i1y] != true
+                    } ifelse
                 } {
                     false% [i1x i1y] != false
                 } ifelse
@@ -750,7 +769,6 @@ lw setlinewidth
                 arc parabola-arc-get-point
                 aload pop% iy apx apy
                 exch     % iy apy apx
-                (HERE) log-stack   % FIXME: Werte stimmen, aber Ergebnis nicht → Rechnung prüfen
                 dup      % iy apy apx apx
                 dup mul  % iy apy apx apx²
                 3 -1 roll% iy apx apx² apy
@@ -862,6 +880,7 @@ lw setlinewidth
     div                   % (px² + (py - iy)² - x²) / (2 * (px - x))
     [ exch iy ]
     end
+    (\n</get-parabolas-intersection>\n) print
 } def
 
 %
@@ -881,6 +900,7 @@ lw setlinewidth
     3 -1 roll            % y2-y1 x2 x2 x1
     sub                  % y2-y1 x2 x2-x1
     add add              % (y2-y1) + x2 + (x2-x1) → x
+    /x exch def
 
     % extend each new edge to the intersection with the new parabola
     /arc root-get def
@@ -896,8 +916,7 @@ lw setlinewidth
             % self.get_parabolas_intersection(arc.point, arc.next_arc.point, 2 * x)
             arc parabola-arc-get-point
             arc parabola-arc-get-next parabola-arc-get-point
-            3 -1 roll
-            2 mul
+            x 2 mul
             get-parabolas-intersection
             % arc.edge2.finish
             arc parabola-arc-get-edge2
@@ -907,6 +926,7 @@ lw setlinewidth
         /arc arc parabola-arc-get-next def
     } loop
     end
+    (\n</finish-edges>\n) print
 } def
 
 
@@ -922,7 +942,7 @@ lw setlinewidth
 %    [20.042 67.723]
 %    [19.844 4.945]
 %    [18.093 10.194]
-%    [17.828 14.802]
+    [17.828 14.802]
     [13.757 63.445]
     [12.985 40.466]
 ]
@@ -932,48 +952,51 @@ def
 
 
 % Kanten
-/edges
+/edges_orig
 [
-    [[-328.620 63.445] [23.347 51.620]]
-    [[-328.620 63.445] [-827074.763 27838.719]]
-    [[-52.593 14.802] [-101.080 5.652]]
-    [[-52.593 14.802] [16.577 27.855]]
-    [[-22.103 10.194] [-101.080 5.652]]
-    [[-22.103 10.194] [31.087 13.253]]
-    [[-101.080 5.652] [-32840.501 -5518.693]]
-    [[11.101 4.945] [-8491.394 -2831.380]]
-    [[11.101 4.945] [31.956 11.902]]
-    [[15.444 67.723] [24.569 54.316]]
-    [[15.444 67.723] [-578.961 940.989]]
-    [[16.634 27.931] [16.577 27.855]]
-    [[16.634 27.931] [27.544 42.470]]
-    [[16.577 27.855] [30.075 15.660]]
-    [[23.608 52.197] [23.347 51.620]]
-    [[23.608 52.197] [24.569 54.316]]
-    [[23.347 51.620] [27.544 42.470]]
-    [[24.569 54.316] [34.053 65.628]]
-    [[33.586 23.810] [30.075 15.660]]
-    [[33.586 23.810] [39.707 38.023]]
-    [[27.976 77.998] [34.053 65.628]]
-    [[27.976 77.998] [-323.933 794.352]]
-    [[27.544 42.470] [39.707 38.023]]
-    [[30.075 15.660] [31.087 13.253]]
-    [[31.087 13.253] [31.956 11.902]]
-    [[31.956 11.902] [214.406 -175.848]]
-    [[34.053 65.628] [270.177 43.682]]
-    [[39.707 38.023] [270.177 43.682]]
-    [[270.177 43.682] [259.165 44.028]]
+    [[-328.620 63.445] [23.347 51.620] true]
+    [[-328.620 63.445] [-827074.763 27838.719] true]
+    [[-52.593 14.802] [-101.080 5.652] true]
+    [[-52.593 14.802] [16.577 27.855] true]
+    [[-22.103 10.194] [-101.080 5.652] true]
+    [[-22.103 10.194] [31.087 13.253] true]
+    [[-101.080 5.652] [-32840.501 -5518.693] true]
+    [[11.101 4.945] [-8491.394 -2831.380] true]
+    [[11.101 4.945] [31.956 11.902] true]
+    [[15.444 67.723] [24.569 54.316] true]
+    [[15.444 67.723] [-578.961 940.989] true]
+    [[16.634 27.931] [16.577 27.855] true]
+    [[16.634 27.931] [27.544 42.470] true]
+    [[16.577 27.855] [30.075 15.660] true]
+    [[23.608 52.197] [23.347 51.620] true]
+    [[23.608 52.197] [24.569 54.316] true]
+    [[23.347 51.620] [27.544 42.470] true]
+    [[24.569 54.316] [34.053 65.628] true]
+    [[33.586 23.810] [30.075 15.660] true]
+    [[33.586 23.810] [39.707 38.023] true]
+    [[27.976 77.998] [34.053 65.628] true]
+    [[27.976 77.998] [-323.933 794.352] true]
+    [[27.544 42.470] [39.707 38.023] true]
+    [[30.075 15.660] [31.087 13.253] true]
+    [[31.087 13.253] [31.956 11.902] true]
+    [[31.956 11.902] [214.406 -175.848] true]
+    [[34.053 65.628] [270.177 43.682] true]
+    [[39.707 38.023] [270.177 43.682] true]
+    [[270.177 43.682] [259.165 44.028] true]
 ]
 def
 
 %1 0 0 setrgbcolor
-% edges {draw-edge} forall
+% edges {draw-vedge} forall
 
 % TODO: points.sort()
 % draw points
 %points {draw-point-a} forall
 % fortune = Fortune(points)
-points 0 0 800 800 fortune
+points 0 0 80 80 fortune
+
+voronoi-edges 0 get {draw-vedge} forall
+points {draw-point-a} forall
 
 ( DONE ) print
 % pstack
