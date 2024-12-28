@@ -108,6 +108,39 @@ lw setlinewidth
 /circle-event-set-point {1 exch put} def
 /circle-event-set-arc   {2 exch put} def
 /circle-event-set-valid {3 exch put} def
+% Circle Events
+/circle-events [ [] ] def
+% FIXME: generalize for other objects (i.e., voronoi edges)
+/circle-events-append {  % cevent
+    [ exch ]             % [cevent]
+    circle-events 0 get  % [cevent] [...]
+    exch                 % [...] [cevent]
+    arr-concat           % [... cevent]
+    circle-events 0      % [... cevent] cevents 0
+    3 -1 roll            % cevents 0 [... cevent]
+    put
+} def
+/circle-events-pop {     %
+    circle-events 0 get  % [...]
+    arr-pop              % [...] cevent
+    circle-events 0      % [...] cevent cevents 0
+    4 -1 roll            % cevent cevents 0 [...]
+    put                  % cevent
+} def
+/circle-events-len {     %
+    circle-events 0 get  % [...]
+    length               % |[...]|
+} def
+/circle-events-get {     % n
+    circle-events 0 get  % n cevents
+    exch                 % cevents n
+    get                  % cevent_n
+} def
+/circle-events-sort {    %
+    ( IMPLEMENT:sort ) print
+    % FIXME: implement
+    quit
+} def
 
 
 % Parabola Arc
@@ -144,7 +177,7 @@ lw setlinewidth
 /voronoi-edge-new {      % point
     [ exch [0 0] false ]
     % [point1 point2 is_finished]
-    % FIXME: add to edges
+    dup voronoi-edges-append
 } def
 % Getter for voronoi edge. Input: vedge
 /voronoi-edge-is_finished {2 get} def
@@ -163,19 +196,19 @@ lw setlinewidth
         true voronoi-edge-set-finished
     } if
 } def
+% Voronoi Edges
+/voronoi-edges [ [] ] def
+% FIXME: generalize for other objects (i.e., voronoi edges)
+/voronoi-edges-append {  % vedge
+    [ exch ]             % [vedge]
+    voronoi-edges 0 get  % [vedge] [...]
+    exch                 % [...] [vedge]
+    arr-concat           % [... vedge]
+    voronoi-edges 0      % [... vedge] vedges 0
+    3 -1 roll            % vedges 0 [... vedge]
+    put
+} def
 
-% Circle Events
-%
-/circle-events-append {  % cevents cevent
-    ( IMPLEMENT:append ) print
-    % FIXME: implement
-    quit
-} def
-/circle-events-sort {    % cevents
-    ( IMPLEMENT:sort ) print
-    % FIXME: implement
-    quit
-} def
 
 % Root
 %
@@ -183,13 +216,14 @@ lw setlinewidth
 /root-get {root 0 get} def
 /root-set {root 0 3 -1 roll put} def
 
+
 %
 % input: [[pnx pny] ... [p1x p1y]]
 %        = a sorted array of points
 % output: [[[x1 y1] [x2 y2]] ... [[x1 y1] [x2 y2]]]
 %        = an array of edges
 %
-/fortune {               % points x1 y1 x2 y2
+/fortune {               % [points] x1 y1 x2 y2
     5 dict begin
     % process arguments
     /y2 exch def
@@ -197,35 +231,30 @@ lw setlinewidth
     /y1 exch def
     /x1 exch def
 
-    % organise stack
-    mark exch            % *
+    % organise stack     % [points]
+    mark exch            % * [points]
     aload pop            % * points
-    []                   % * points [edges]
-    []                   % * points [edges] [cevents]
 
     % loop over points
     {
         (<fortune loop>) log-stack
         % while len(fortune.points) > 0:
-        counttomark      % 2 + len(fortune.points)
-        2 sub            % len(fortune.points)
+        counttomark      % len(fortune.points)
         0 le { exit } if % <= 0 → exit loop
         % if ...
-        dup length       % len(fortune.circle_events)
+        circle-events-len
         0 gt             % |cevents| > 0
         { % len(fortune.circle_events) > 0
-            dup 0 get    % cevents[0]
+            0 circle-events-get
             circle-event-get-x
-            3 index 0 get% cevents[0].x [px py]
+            1 index 0 get% cevents[0].x [px py]
             0 get le     % cevents[0].x <= px
             { % fortune.circle_events[0].x <= fortune.points[0].x
                 process-circle-event
             } {
-                ( pp1 ) print
                 x1 process-point
             } ifelse
         } {
-            ( pp2 ) print
             x1 process-point
         } ifelse
         (</fortune loop>) log-stack
@@ -240,27 +269,23 @@ lw setlinewidth
 %
 % Process the remaining leftmost point (right of the sweep line).
 %
-% input: pn ... p0 [edges] [circle_events] x
+% input: pn ... p0 x
 % no output
 %
-/process-point {         % pn ... p1 p0 [edges] [circle_events] x
-    4 -1 roll            % pn ... p1 [edges] [circle_events] x p0
-    exch                 % pn ... p1 [edges] [circle_events] p0 x
-    add-new-arc          % pn ... p1 [edges] [circle_events]
+/process-point {         % pn ... p1 p0 x
+    add-new-arc          % pn ... p1
 } def
 
 %
 % Process circle event with the smallest x coordinate.
 %
-% input: pn ... p0 [edges] [circle_events]
-% output:
+% no input
+% no output
 %
 /process-circle-event {
     ( process-circle-event ) log-stack
     3 dict begin
-    % process arguments
-    arr-pop              % cevent
-    /cevent exch def
+    /cevent circle-events-pop def
 
     cevent circle-event-is-valid
     {
@@ -268,12 +293,6 @@ lw setlinewidth
         cevent circle-event-get-point
         voronoi-edge-new
         /edge exch def
-        % add edge to list
-        [ edge ]     % points [vedges] [cevents] [vedge]
-        3 -1 roll    % points [cevents] [vedge] [vedges]
-        exch         % points [cevents] [vedges] [vedge]
-        arr-concat   % points [cevents] [vedges]
-        2 1 roll     % points [vedges] [cevents]
 
         % arc = circle_event.arc
         /arc cevent circle-event-get-arc def
@@ -437,14 +456,6 @@ lw setlinewidth
                 dup      % [i1x i1y] [i1x i1y]
                 voronoi-edge-new
 
-                % add edge to list
-                dup      % points [vedges] [cevents] [i1] vedge vedge
-                [ exch ] % points [vedges] [cevents] [i1] vedge [vedge]
-                5 -1 roll% points [cevents] [i1] vedge [vedge] [vedges]
-                exch     % points [cevents] [i1] vedge [vedges] [vedge]
-                arr-concat%points [cevents] [i1] vedge [vedges]
-                4 1 roll % points [vedges] [cevents] [i1] vedge
-
                 dup      % [i1x i1y] vedge vedge
                 arc exch % [i1x i1y] vedge arc vedge
                 parabola-arc-set-edge1
@@ -454,14 +465,6 @@ lw setlinewidth
                 parabola-arc-set-edge2
                 % arc.edge2 = VoronoiEdge(intersection1)
                 voronoi-edge-new
-
-                % add edge to list
-                 dup      % points [vedges] [cevents] vedge vedge
-                [ exch ] % points [vedges] [cevents] vedge [vedge]
-                4 -1 roll% points [cevents] vedge [vedge] [vedges]
-                exch     % points [cevents] vedge [vedges] [vedge]
-                arr-concat%points [cevents] vedge [vedges]
-                3 1 roll % points [vedges] [cevents] vedge
 
                 dup      % vedge vedge
                 arc exch % vedge arc vedge
@@ -505,13 +508,6 @@ lw setlinewidth
                 add
                 2 div    % (arc.next_arc.point.y + arc.point.y) / 2)
             ] voronoi-edge-new
-            % add edge to list
-            dup          % points [vedges] [cevents] vedge vedge
-            [ exch ]     % points [vedges] [cevents] vedge [vedge]
-            4 -1 roll    % points [cevents] vedge [vedge] [vedges]
-            exch         % points [cevents] vedge [vedges] [vedge]
-            arr-concat   % points [cevents] vedge [vedges]
-            3 1 roll     % points [vedges] [cevents] vedge
 
             % arc.next_arc.edge1 = VoronoiEdge(...)
             dup          % vedge vedge
