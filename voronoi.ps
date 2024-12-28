@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0
 
 % includes
-(sort.inc) run
+% (sort.inc) run
 
 
 % Koordinatensystem initialisieren
@@ -14,52 +14,31 @@
 /lw 0.25 def
 lw setlinewidth
 
-% Punkte
-[
-    [12.985 40.466]
-    [13.757 63.445]
-    [17.828 14.802]
-    [18.093 10.194]
-    [19.844 4.945]
-    [20.042 67.723]
-    [29.689 27.931]
-    [38.560 52.197]
-    [39.257 23.810]
-    [40.958 77.998]
-]
+/debug {                % fname
+    (\n) print
+    (### ) print
+    print
+    ( ###) print
+    (\n) print
+    pstack
+    (\n) print
+} def
 
-% Kanten
-[
-    [[-328.620 63.445] [23.347 51.620]]
-    [[-328.620 63.445] [-827074.763 27838.719]]
-    [[-52.593 14.802] [-101.080 5.652]]
-    [[-52.593 14.802] [16.577 27.855]]
-    [[-22.103 10.194] [-101.080 5.652]]
-    [[-22.103 10.194] [31.087 13.253]]
-    [[-101.080 5.652] [-32840.501 -5518.693]]
-    [[11.101 4.945] [-8491.394 -2831.380]]
-    [[11.101 4.945] [31.956 11.902]]
-    [[15.444 67.723] [24.569 54.316]]
-    [[15.444 67.723] [-578.961 940.989]]
-    [[16.634 27.931] [16.577 27.855]]
-    [[16.634 27.931] [27.544 42.470]]
-    [[16.577 27.855] [30.075 15.660]]
-    [[23.608 52.197] [23.347 51.620]]
-    [[23.608 52.197] [24.569 54.316]]
-    [[23.347 51.620] [27.544 42.470]]
-    [[24.569 54.316] [34.053 65.628]]
-    [[33.586 23.810] [30.075 15.660]]
-    [[33.586 23.810] [39.707 38.023]]
-    [[27.976 77.998] [34.053 65.628]]
-    [[27.976 77.998] [-323.933 794.352]]
-    [[27.544 42.470] [39.707 38.023]]
-    [[30.075 15.660] [31.087 13.253]]
-    [[31.087 13.253] [31.956 11.902]]
-    [[31.956 11.902] [214.406 -175.848]]
-    [[34.053 65.628] [270.177 43.682]]
-    [[39.707 38.023] [270.177 43.682]]
-    [[270.177 43.682] [259.165 44.028]]
-]
+/debug1 {                % fname
+    (\n) print
+    (### ) print
+    print
+    ( ###) print
+    (\n) print
+    stack
+    (\n) print
+} def
+
+/debug2 {
+    (\n ########## HERE ##########\n) print
+    pstack
+    (\n ########## HERE ##########\n) print
+} def
 
 % draw a point at (x,y) as a circle with radius r
 /draw-point {            % x y r
@@ -96,11 +75,6 @@ lw setlinewidth
     grestore
 } def
 
-
-{draw-edge} forall
-
-% loop over array of points
-{draw-point-a} forall
 
 % Funktionen für Datenstrukturen
 
@@ -151,10 +125,16 @@ lw setlinewidth
     % [x point arc is_valid]
 } def
 % Getter for circle event. Input: cevent
-/circle-event-get-x     {0 get}
-/circle-event-get-point {1 get}
-/circle-event-get-arc   {2 get}
-/circle-event-is-valid  {3 get}
+/circle-event-get-x     {0 get} def
+/circle-event-get-point {1 get} def
+/circle-event-get-arc   {2 get} def
+/circle-event-is-valid  {3 get} def
+% Setter for circle event. Input: cevent value
+/circle-event-set-x     {0 exch put} def
+/circle-event-set-point {1 exch put} def
+/circle-event-set-arc   {2 exch put} def
+/circle-event-set-valid {3 exch put} def
+
 
 % Parabola Arc
 %
@@ -168,18 +148,18 @@ lw setlinewidth
     % [point previous_arc next_arc circle_event edge1 edge2]
 } def
 % Getter for parabola arc. Input: parabolaarc
-/parabola-arc-get-point    {0 get}
-/parabola-arc-get-previous {1 get}
-/parabola-arc-get-next     {2 get}
-/parabola-arc-get-cevent   {3 get}
-/parabola-arc-get-edge1    {4 get}
-/parabola-arc-get-edge2    {5 get}
+/parabola-arc-get-point    {(pag-point) debug1 0 get} def
+/parabola-arc-get-previous {(pag-previous) debug1 1 get} def
+/parabola-arc-get-next     {(pag-next) debug1 2 get} def
+/parabola-arc-get-cevent   {(pag-cevent) debug1 3 get} def
+/parabola-arc-get-edge1    {4 get} def
+/parabola-arc-get-edge2    {5 get} def
 % Setter for parabola arc. Input: parabolaarc value
-/parabola-arc-set-previous {1 exch put}
-/parabola-arc-set-next     {2 exch put}
-/parabola-arc-set-cevent   {3 exch put}
-/parabola-arc-set-edge1    {4 exch put}
-/parabola-arc-set-edge2    {5 exch put}
+/parabola-arc-set-previous {1 exch put} def
+/parabola-arc-set-next     {2 exch put} def
+/parabola-arc-set-cevent   {3 exch put} def
+/parabola-arc-set-edge1    {4 exch put} def
+/parabola-arc-set-edge2    {5 exch put} def
 
 % Voronoi Edge
 %
@@ -193,11 +173,11 @@ lw setlinewidth
     % FIXME: add to edges
 } def
 % Getter for voronoi edge. Input: vedge
-/voronoi-edge-is_finished {2 get}
+/voronoi-edge-is_finished {2 get} def
 % Setter for voronoi edge. Input: vedge value
-/voronoi-edge-set-point1   {0 exch put}
-/voronoi-edge-set-point2   {1 exch put}
-/voronoi-edge-set-finished {2 exch put}
+/voronoi-edge-set-point1   {0 exch put} def
+/voronoi-edge-set-point2   {1 exch put} def
+/voronoi-edge-set-finished {2 exch put} def
 /voronoi-edge-finish {   % vedge point
     exch dup             % point vedge vedge
     voronoi-edge-is-finished
@@ -210,7 +190,24 @@ lw setlinewidth
     } if
 } def
 
+% Circle Events
+%
+/circle-events-append {  % cevents cevent
+    ( IMPLEMENT:append ) print
+    % FIXME: implement
+    quit
+} def
+/circle-events-sort {    % cevents
+    ( IMPLEMENT:sort ) print
+    % FIXME: implement
+    quit
+} def
 
+% Root
+%
+/root [ null ] def
+/root-get {root 0 get} def
+/root-set {root 0 3 -1 roll put} def
 
 %
 % input: [[pnx pny] ... [p1x p1y]]
@@ -218,8 +215,52 @@ lw setlinewidth
 % output: [[[x1 y1] [x2 y2]] ... [[x1 y1] [x2 y2]]]
 %        = an array of edges
 %
-/fortune {
-    /root null def
+/fortune {               % points x1 y1 x2 y2
+    5 dict begin
+    % process arguments
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+
+    % organise stack
+    mark exch            % *
+    aload pop            % * points
+    []                   % * points [edges]
+    []                   % * points [edges] [cevents]
+
+    pstack
+    % loop over points
+    {
+        ( loop ) print
+        % while len(fortune.points) > 0:
+        counttomark      % 2 + len(fortune.points)
+        2 sub            % len(fortune.points)
+        0 le { exit } if % <= 0 → exit loop
+        % if ...
+        dup length       % len(fortune.circle_events)
+        0 gt             % |cevents| > 0
+        { % len(fortune.circle_events) > 0
+            dup 0 get    % cevents[0]
+            circle-event-get-x
+            3 index 0 get% cevents[0].x [px py]
+            0 get le     % cevents[0].x <= px
+            { % fortune.circle_events[0].x <= fortune.points[0].x
+                process-circle-event
+            } {
+                ( pp1 ) print
+                x1 process-point
+            } ifelse
+        } {
+            ( pp2 ) print
+            x1 process-point
+        } ifelse
+
+    } loop
+
+    % after all points are processed, finish remaining circle events
+    % FIXME: TODO
+    end
 } def
 
 %
@@ -241,8 +282,9 @@ lw setlinewidth
 % output:
 %
 /process-circle-event {
-    % process arguments
+    ( process-circle-event ) debug
     3 dict begin
+    % process arguments
     arr-pop              % cevent
     /cevent exch def
 
@@ -318,37 +360,50 @@ lw setlinewidth
 % no output
 %
 /add-new-arc {           % [px py] x
-    % process arguments
+    ( add-new-arc ) debug
     5 dict begin
+    % process arguments
     /x exch def          % [px py]
     aload pop            % px py
     /py exch def         % px
     /px exch def         %
 
-    root null eq {
+    root-get null eq {
         [px py]          % [px py]
         null null        % [px py] null null
         parabola-arc-new % pa
-        /root exch def   % /root → pa
+        root-set         % /root → pa
     } {
         % determine the current parabola arc with the coordinate of point
-        /arc root def
+        /arc root-get def
+        % while arc is not None:
         {
+            (\nLOOP START\n) print
+
             arc null eq {% exit when arc is null
                 exit
             } if
             % check for intersection
             [px py] arc get-intersection
             {            % [i1x i1y]
+                % if arc.next_arc is not None and
+                %    not self.get_intersection(point, arc.next_arc):
                 arc parabola-arc-get-next
+                (\n##### next #####\n) print
                 null ne  % [i1x i1y] !=
-                [px py]  % [i1x i1y] != [px py]
-                arc parabola-arc-get-next
-                get-intersection
-                not      % [i1x i1y] != [i2x i2y] !=
-                exch pop % [i1x i1y] != !=
+                dup      % [i1x i1y] != !=
+                {
+                    [px py]  % [i1x i1y] != [px py]
+                    arc parabola-arc-get-next
+                    get-intersection
+                    not  % [i1x i1y] != [i2x i2y] !=
+                    exch % [i1x i1y] != != [i2x i2y]
+                    pop  % [i1x i1y] != !=
+                } {
+                    false% [i1x i1y] != false
+                } ifelse
                 and      % [i1x i1y] != and !=
-                {        % [i1x i1y]
+                {
                     arc parabola-arc-get-next
                     % build new parabola arc ...
                     arc parabola-arc-get-point
@@ -369,7 +424,7 @@ lw setlinewidth
                     parabola-arc-new
                     % arc.next_arc = ...
                     parabola-arc-set-next
-                } ifelse
+                } ifelse % [i1x i1y]
                 % arc.next_arc.edge2 = arc.edge2
                 arc parabola-arc-get-next
                 arc parabola-arc-get-edge2
@@ -377,8 +432,9 @@ lw setlinewidth
 
                 % insert new parabola arc between arc and arc.next_arc
                 % arc.next_arc.previous_arc = ParabolaArc(point, arc, arc.next_arc)
+                % FIXME: hier weiter bei .next() ist Stack defekt
                 arc parabola-arc-get-next
-                point arc arc parabola-arc-get-next
+                [px py] arc arc parabola-arc-get-next
                 parabola-arc-new
                 parabola-arc-set-previous
                 % arc.next_arc = arc.next_arc.previous_arc
@@ -388,6 +444,12 @@ lw setlinewidth
                 parabola-arc-set-next
                 % arc = arc.next_arc
                 /arc arc parabola-arc-get-next def
+                % FIXME: debug
+                arc 0 get% [px py]
+                aload pop% px py
+                exch     % py px
+                (\nARC px = ) print (        ) cvs print
+                (\nARC py = ) print (        ) cvs print (\n) print
 
                 % connect two new edges with the endpoints of the parabola arc
                 % arc.edge1 = VoronoiEdge(intersection1)
@@ -405,22 +467,22 @@ lw setlinewidth
                 parabola-arc-set-edge2
                 % arc.next_arc.edge1 = arc.edge2
                 arc parabola-arc-get-next
-                % exch   % arc vedge
+                exch     % arc vedge
                 parabola-arc-set-edge1
+
 
                 % check neighboring circle events of the parabola arc
                 arc                           px check-circle-event
                 arc parabola-arc-get-previous px check-circle-event
                 arc parabola-arc-get-next     px check-circle-event
-                % return
-            } {
-                /arc arc parabola-arc-get-next def
-            } ifelse
+                exit % return % FIXME: hier wirklich RETURN und nicht nach loop weiter!
+            } if
+            /arc arc parabola-arc-get-next def
         } loop
 
         % special case: if the parabola arc does not intersect with
         % another arc it will be added to the doubly linked list
-        /arc root def
+        /arc root-get def
         {
             % determine last parabola arc
             arc parabola-arc-get-next
@@ -453,23 +515,61 @@ lw setlinewidth
 } def
 
 %
-% If necessary, create a new circle event for the given parabola arc
+% If necessary, create a new circle event for the given parabola arc.
 %
 % input: arc x
 % no output
 %
 /check-circle-event {    % arc x
-    % process arguments
+    ( check-circle-event ) debug1
     3 dict begin
+    % process arguments
     /x exch def
     /arc exch def
 
     % invalidate current circle event
+    % if arc.circle_event is not None and arc.circle_event.x != _x:
     arc parabola-arc-get-cevent dup
+    null ne              % cevent !=
+    {
+        circle-event-get-x
+        x ne
+        {
+            % arc.circle_event.is_valid = False
+            arc parabola-arc-get-cevent
+            false circle-event-set-valid
+        } if
+    } if
+    % arc.circle_event = None
+    arc null parabola-arc-set-cevent
+    % if arc.previous_arc is None or arc.next_arc is None:
+    arc parabola-arc-get-previous
     null ne
-    exch
-    % FIXME: hier weiter
-
+    arc parabola-arc-get-next
+    null ne
+    and
+    {
+        arc parabola-arc-get-previous parabola-arc-get-point
+        arc parabola-arc-get-point
+        arc parabola-arc-get-next parabola-arc-get-point
+        get-rightmost-circle-point
+        {                % [px py] x
+            dup x        % [px py] x x _x
+            gt           % [px py] x x > _x
+            pstack
+            {            % [px py] x
+                exch arc % x [px py] arc
+                circle-event-new
+                dup      % cevent cevent
+                arc exch % cevent arc cevent
+                parabola-arc-set-cevent
+                         % cevent
+                % FIXME: add args for next two calls (if necessary)
+                circle-events-append
+                circle-events-sort
+            } if
+        } if
+    } if
     end
 } def
 
@@ -483,8 +583,9 @@ lw setlinewidth
 %   [px py] x true
 %
 /get-rightmost-circle-point { % [p1x p1y] [p2x p2y] [p3x p3y]
-    % process arguments
+    ( get-rightmost-circle-point ) debug
     12 dict begin
+    % process arguments
     aload pop /p3y exch def /p3x exch def
     aload pop /p2y exch def /p2x exch def
     aload pop /p1y exch def /p1x exch def
@@ -569,38 +670,45 @@ lw setlinewidth
 %   [ix iy] true
 %
 /get-intersection {      % [px py] arc
-    % process arguments
+    ( get-intersection ) debug1
     5 dict begin
+    % process arguments
     /arc exch def        % [px py]
     aload pop            % px py
     /py exch def
     /px exch def
 
+    % if arc.point.x == point.x:
     arc parabola-arc-get-point
+    aload pop
     pop px eq {
         false            % focal points match → return false
     } {
+        % if arc.previous_arc is not None:
         arc parabola-arc-get-previous
         dup              % pa pa
         null ne {        % pa !=
             % compute y coordinate of the intersection between the
             % current and the previous parabola arc
-            parabolas-arc-get-point
-            arc parabolas-arc-get-point
+            parabola-arc-get-point
+            arc parabola-arc-get-point
             px           % [p1x p1y] [p2x p2y] x
             get-parabolas-intersection
                          % [ix iy]
             aload pop    % ix iy
             /y1 exch def % ix
             pop
-        } if
+        } {
+            pop          % remove pa
+        } ifelse
+        % if arc.next_arc is not None:
         arc parabola-arc-get-next
         dup              % pa pa
         null ne {        % pa !=
             % compute y coordinate of the intersection between the
             % current and the next parabola arc
-            parabolas-arc-get-point
-            arc parabolas-arc-get-point
+            parabola-arc-get-point
+            arc parabola-arc-get-point
             exch
             px           % [p1x p1y] [p2x p2y] x
             get-parabolas-intersection
@@ -608,14 +716,17 @@ lw setlinewidth
             aload pop    % ix iy
             /y2 exch def % ix
             pop
-        } if
+        } {
+            pop          % remove pa
+        } ifelse
 
         % compute coordinate of the intersection, if it exists
-        arc parabolas-arc-get-previous
+        % if (arc.previous_arc is None or y1 <= point.y) and (arc.next_arc is None or point.y <= y2):
+        arc parabola-arc-get-previous
         null eq
         y1 py le
         or               % arc.previous_arc is None or y1 <= point.y
-        arc parabolas-arc-get-next
+        arc parabola-arc-get-next
         null eq
         py y2 le
         or               % arc.next_arc is None or point.y <= y2
@@ -623,9 +734,10 @@ lw setlinewidth
         {
             [
                 py       % iy
-                arc parabolas-arc-get-point
+                arc parabola-arc-get-point
                 aload pop% iy apx apy
                 exch     % iy apy apx
+                debug2   % FIXME: Werte stimmen, aber Ergebnis nicht → Rechnung prüfen
                 dup      % iy apy apx apx
                 dup mul  % iy apy apx apx²
                 3 -1 roll% iy apx apx² apy
@@ -636,8 +748,8 @@ lw setlinewidth
                 sub add  % iy apx apx² + (apy-iy)² - px²
                 exch     % iy apx² + (apy-iy)² - px² apx
                 px sub   % iy apx² + (apy-iy)² - px² apx-px
-                2 mul    % iy apx² + (apy-iy)² - px² 2*apx-px
-                div      % iy (apx² + (apy-iy)² - px²) / (2*apx-px)
+                2 mul    % iy apx² + (apy-iy)² - px² 2*(apx-px)
+                div      % iy (apx² + (apy-iy)² - px²) / (2*(apx-px))
                 exch     % ix iy
             ]
             true         % return [ix iy] true
@@ -657,8 +769,9 @@ lw setlinewidth
 % output: [ix iy]
 %
 /get-parabolas-intersection { % [p1x p1y] [p2x p2y] x
-    % process arguments
+    ( get-parabolas-intersection ) debug
     13 dict begin
+    % process arguments
     /x exch def
     aload pop /p2y exch def /p2x exch def
     aload pop /p1y exch def /p1x exch def
@@ -743,7 +856,9 @@ lw setlinewidth
 % input: x1 y1 x2 y2
 % no output
 %
-finish-edges {           % x1 y1 x2 y2
+/finish-edges {           % x1 y1 x2 y2
+    ( finish-edges ) debug
+    1 dict begin
     % move sweep line such that no parabola cuts through the drawing plane
     3 -1 roll            % x1 x2 y2 y1
     sub                  % x1 x2 y2-y1
@@ -754,9 +869,100 @@ finish-edges {           % x1 y1 x2 y2
     add add              % (y2-y1) + x2 + (x2-x1) → x
 
     % extend each new edge to the intersection with the new parabola
-    % FIXME: hier weiter. /arc definieren (dafür dict hinzufügen) oder
-    % nur mit Stack wurschteln?
-
+    /arc root-get def
+    {
+        arc parabola-arc-get-next
+        null eq
+        {
+            exit
+        } if
+        arc parabola-arc-get-edge2
+        null ne
+        {
+            % self.get_parabolas_intersection(arc.point, arc.next_arc.point, 2 * x)
+            arc parabola-arc-get-point
+            arc parabola-arc-get-next parabola-arc-get-point
+            3 -1 roll
+            2 mul
+            get-parabolas-intersection
+            % arc.edge2.finish
+            arc parabola-arc-get-edge2
+            exch
+            voronoi-edge-finish
+        } if
+        /arc arc parabola-arc-get-next def
+    } loop
+    end
 } def
 
-showpage
+
+
+
+% Punkte
+/points
+[
+%    [40.958 77.998]
+%    [39.257 23.810]
+%    [38.560 52.197]
+%    [29.689 27.931]
+%    [20.042 67.723]
+%    [19.844 4.945]
+%    [18.093 10.194]
+%    [17.828 14.802]
+    [13.757 63.445]
+    [12.985 40.466]
+]
+def
+
+
+
+
+% Kanten
+/edges
+[
+    [[-328.620 63.445] [23.347 51.620]]
+    [[-328.620 63.445] [-827074.763 27838.719]]
+    [[-52.593 14.802] [-101.080 5.652]]
+    [[-52.593 14.802] [16.577 27.855]]
+    [[-22.103 10.194] [-101.080 5.652]]
+    [[-22.103 10.194] [31.087 13.253]]
+    [[-101.080 5.652] [-32840.501 -5518.693]]
+    [[11.101 4.945] [-8491.394 -2831.380]]
+    [[11.101 4.945] [31.956 11.902]]
+    [[15.444 67.723] [24.569 54.316]]
+    [[15.444 67.723] [-578.961 940.989]]
+    [[16.634 27.931] [16.577 27.855]]
+    [[16.634 27.931] [27.544 42.470]]
+    [[16.577 27.855] [30.075 15.660]]
+    [[23.608 52.197] [23.347 51.620]]
+    [[23.608 52.197] [24.569 54.316]]
+    [[23.347 51.620] [27.544 42.470]]
+    [[24.569 54.316] [34.053 65.628]]
+    [[33.586 23.810] [30.075 15.660]]
+    [[33.586 23.810] [39.707 38.023]]
+    [[27.976 77.998] [34.053 65.628]]
+    [[27.976 77.998] [-323.933 794.352]]
+    [[27.544 42.470] [39.707 38.023]]
+    [[30.075 15.660] [31.087 13.253]]
+    [[31.087 13.253] [31.956 11.902]]
+    [[31.956 11.902] [214.406 -175.848]]
+    [[34.053 65.628] [270.177 43.682]]
+    [[39.707 38.023] [270.177 43.682]]
+    [[270.177 43.682] [259.165 44.028]]
+]
+def
+
+%1 0 0 setrgbcolor
+% edges {draw-edge} forall
+
+% TODO: points.sort()
+% draw points
+%points {draw-point-a} forall
+% fortune = Fortune(points)
+points 0 0 800 800 fortune
+
+( DONE ) print
+% pstack
+
+
+% showpage
