@@ -232,7 +232,8 @@ lw setlinewidth
     } loop
 
     % after all points are processed, finish remaining circle events
-    % FIXME: TODO
+    % FIXME: TODO process circle events
+
     end
 } def
 
@@ -267,6 +268,13 @@ lw setlinewidth
         cevent circle-event-get-point
         voronoi-edge-new
         /edge exch def
+        % add edge to list
+        [ edge ]     % points [vedges] [cevents] [vedge]
+        3 -1 roll    % points [cevents] [vedge] [vedges]
+        exch         % points [cevents] [vedges] [vedge]
+        arr-concat   % points [cevents] [vedges]
+        2 1 roll     % points [vedges] [cevents]
+
         % arc = circle_event.arc
         /arc cevent circle-event-get-arc def
 
@@ -427,7 +435,17 @@ lw setlinewidth
                 % connect two new edges with the endpoints of the parabola arc
                 % arc.edge1 = VoronoiEdge(intersection1)
                 dup      % [i1x i1y] [i1x i1y]
-                voronoi-edge-new dup
+                voronoi-edge-new
+
+                % add edge to list
+                dup      % points [vedges] [cevents] [i1] vedge vedge
+                [ exch ] % points [vedges] [cevents] [i1] vedge [vedge]
+                5 -1 roll% points [cevents] [i1] vedge [vedge] [vedges]
+                exch     % points [cevents] [i1] vedge [vedges] [vedge]
+                arr-concat%points [cevents] [i1] vedge [vedges]
+                4 1 roll % points [vedges] [cevents] [i1] vedge
+
+                dup      % [i1x i1y] vedge vedge
                 arc exch % [i1x i1y] vedge arc vedge
                 parabola-arc-set-edge1
                 % arc.previous_arc.edge2 = arc.edge1
@@ -435,7 +453,17 @@ lw setlinewidth
                 exch     % [i1x i1y] arc vedge
                 parabola-arc-set-edge2
                 % arc.edge2 = VoronoiEdge(intersection1)
-                voronoi-edge-new dup
+                voronoi-edge-new
+
+                % add edge to list
+                 dup      % points [vedges] [cevents] vedge vedge
+                [ exch ] % points [vedges] [cevents] vedge [vedge]
+                4 -1 roll% points [cevents] vedge [vedge] [vedges]
+                exch     % points [cevents] vedge [vedges] [vedge]
+                arr-concat%points [cevents] vedge [vedges]
+                3 1 roll % points [vedges] [cevents] vedge
+
+                dup      % vedge vedge
                 arc exch % vedge arc vedge
                 parabola-arc-set-edge2
                 % arc.next_arc.edge1 = arc.edge2
@@ -477,6 +505,14 @@ lw setlinewidth
                 add
                 2 div    % (arc.next_arc.point.y + arc.point.y) / 2)
             ] voronoi-edge-new
+            % add edge to list
+            dup          % points [vedges] [cevents] vedge vedge
+            [ exch ]     % points [vedges] [cevents] vedge [vedge]
+            4 -1 roll    % points [cevents] vedge [vedge] [vedges]
+            exch         % points [cevents] vedge [vedges] [vedge]
+            arr-concat   % points [cevents] vedge [vedges]
+            3 1 roll     % points [vedges] [cevents] vedge
+
             % arc.next_arc.edge1 = VoronoiEdge(...)
             dup          % vedge vedge
             arc parabola-arc-get-next
@@ -506,7 +542,7 @@ lw setlinewidth
     % invalidate current circle event
     % if arc.circle_event is not None and arc.circle_event.x != _x:
     arc parabola-arc-get-cevent dup
-    null ne              % cevent != null
+    null ne              % cevent !=
     {
         circle-event-get-x
         x ne
@@ -515,13 +551,11 @@ lw setlinewidth
             arc parabola-arc-get-cevent
             false circle-event-set-valid
         } if
-    } {                  %
+    } {                  % cevent
+        pop
     } ifelse
     % arc.circle_event = None
     arc null parabola-arc-set-cevent
-    (-------------------------------------\n) print
-    print-stack
-    (-------------------------------------\n) print
 
     % if arc.previous_arc is None or arc.next_arc is None:
     arc parabola-arc-get-previous
@@ -530,6 +564,7 @@ lw setlinewidth
     null ne
     and
     {
+        (---- HIER DRINNEN ---------------------------------------\n) print
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
@@ -537,7 +572,6 @@ lw setlinewidth
         {                % [px py] x
             dup x        % [px py] x x _x
             gt           % [px py] x x > _x
-            pstack
             {            % [px py] x
                 exch arc % x [px py] arc
                 circle-event-new
@@ -552,8 +586,6 @@ lw setlinewidth
         } if
     } if
     end
-    (-------------------\n) print
-    print-stack
 
     (\n</check-circle-event>\n) print
 } def
@@ -843,7 +875,7 @@ lw setlinewidth
 % no output
 %
 /finish-edges {           % x1 y1 x2 y2
-    ( finish-edges ) log-stack
+    (<finish-edges>) log-stack
     1 dict begin
     % move sweep line such that no parabola cuts through the drawing plane
     3 -1 roll            % x1 x2 y2 y1
