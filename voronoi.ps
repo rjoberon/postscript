@@ -34,22 +34,20 @@
         0 0              % r 0 0
         3 -1 roll        % 0 0 r
         0 360            % 0 0 r 0 360
-        arc
+        arc              %
         stroke
     grestore
 } def
-% draw a point given as array [x y] at (x,y) as a circle with radius 5
+% draw a point given as array [x y] at (x,y) as a circle with radius 1
 /draw-point-a {          % [x y]
-    aload                % x y [x y]
-    pop                  % x y
-    1                    % x y 5
-    draw-point
+    aload pop            % x y
+    1 draw-point         %
 } def
 % draw an edge from (x1, y1) to (x2, y2)
 /draw-vedge {             % [[x1 y1] [x2 y2] true]
     aload pop pop         % [x1 y1] [x2 y2]
     gsave
-        2 1 roll         % [x2 y2] [x1 y1]
+        exch             % [x2 y2] [x1 y1]
         aload pop        % [x2 y2] x1 y1
         moveto           % [x2 y2]
         aload pop        % x2 y2
@@ -153,18 +151,6 @@
     circle-event-get-x   % y.x x.x
     gt                   % y.x > x.x
 } def
-/circle-events-print {   % cevent
-    % [x point arc is_valid]
-    ([) print
-    dup 0 get (            ) cvs print ( ) print
-    1 get point-print
-    (]) print
-} def
-/circle-events-print-all {
-    (\n<CEVENTS>\n) print
-    circle-events 0 get {circle-events-print (\n) print} forall
-    (</CEVENTS>) print
-} def
 
 % Parabola Arc
 %
@@ -197,30 +183,6 @@
     (         ) cvs print% py
     ( ) print
     (         ) cvs print% py
-    (]) print
-} def
-/parabola-arc-print-null {% arc
-    dup null eq {
-        (null) print
-        pop
-    } {
-        ([) print
-        0 get
-        point-print
-        ( ...) print
-        (]) print
-    } ifelse
-} def
-/parabola-arc-print {    % arc
-    ([) print
-    dup 0 get            % arc [px py]
-    point-print
-    ( ) print
-    dup 1 get            % arc previous_arc
-    parabola-arc-print-null
-    2 get                % next_arc
-    ( ) print
-    parabola-arc-print-null
     (]) print
 } def
 
@@ -315,7 +277,6 @@
         } {
             x1 process-point
         } ifelse
-        % (\n</fortune loop>\n) print
     } loop
 
     % after all points are processed, finish remaining circle events
@@ -578,7 +539,6 @@
         } if
     } ifelse
     end
-    % (\n</add-new-arc>\n) print
 } def
 
 %
@@ -639,8 +599,6 @@
         } if
     } if
     end
-
-%    (\n</check-circle-event>\n) print
 } def
 
 % Given three points, check whether they are all on one line. If not,
@@ -825,9 +783,7 @@
             false        % return false
         } ifelse
     } ifelse
-
     end
-    % (\n</get-intersection>\n) print
 } def
 
 %
@@ -917,7 +873,6 @@
     div                   % (px² + (py - iy)² - x²) / (2 * (px - x))
     [ exch iy ]
     end
-%    (\n</get-parabolas-intersection>\n) print
 } def
 
 %
@@ -963,7 +918,6 @@
         /arc arc parabola-arc-get-next def
     } loop
     end
-%    (\n</finish-edges>\n) print
 } def
 
 % actual data
