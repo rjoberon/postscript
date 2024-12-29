@@ -81,6 +81,20 @@ lw setlinewidth
     getinterval          % an [a1 a2 ... ]
     exch                 % [a1 a2 ... ] an
 } def
+%
+% input: [a1 a2 ... an]
+% output: [a2 ... an] a1
+%
+/arr-pop0 {              % [a1 a2 ... an] → [a2 ... an] a1
+    dup dup length       % [a1 a2 ... an] [a1 a2 ... an] n
+    exch                 % [a1 a2 ... an] n [a1 a2 ... an]
+    0 get                % [a1 a2 ... an] n a1
+    3 1 roll             % an [a1 a2 ... an] n
+    1 exch               % an [a1 a2 ... an] 1 n
+    1 sub                % an [a1 a2 ... an] 1 n-1
+    getinterval          % an [a2 ... an]
+    exch                 % [a2 ... an] an
+} def
 
 % Datenstrukturen:
 % - points → stack
@@ -123,7 +137,7 @@ lw setlinewidth
 } def
 /circle-events-pop {     %
     circle-events 0 get  % [...]
-    arr-pop              % [...] cevent
+    arr-pop0             % [...] cevent
     circle-events 0      % [...] cevent cevents 0
     4 -1 roll            % cevent cevents 0 [...]
     put                  % cevent
@@ -150,8 +164,18 @@ lw setlinewidth
     circle-event-get-x   % y.x x.x
     gt                   % y.x > x.x
 } def
-
-
+/circle-events-print {   % cevent
+    % [x point arc is_valid]
+    ([) print
+    dup 0 get (            ) cvs print ( ) print
+    1 get point-print
+    (]) print
+} def
+/circle-events-print-all {
+    (\n<CEVENTS>\n) print
+    circle-events 0 get {circle-events-print (\n) print} forall
+    (</CEVENTS>) print
+} def
 
 % Parabola Arc
 %
@@ -295,7 +319,9 @@ lw setlinewidth
         circle-events-len
         0 gt             % |cevents| > 0
         { % len(fortune.circle_events) > 0
+            circle-events-print-all
             0 circle-events-get
+            dup (\n---- ---- ---- ) print circle-events-print
             circle-event-get-x
             1 index      % cevents[0].x [px py]
             0 get le     % cevents[0].x <= px
@@ -342,17 +368,25 @@ lw setlinewidth
 /process-circle-event {
     (<process-circle-event>) log-stack
     3 dict begin
+
+    circle-events-print-all % DEBUG
+
     /cevent circle-events-pop def
 
     cevent circle-event-is-valid
     {
+        (\nis_valid) print
         % edge = VoronoiEdge(circle_event.point) # new edge
+        % FIXME: das scheint das falsche circle-event zu sein → funktioniert Sortierung?
+        % ---> Ausgabe der ganzen Liste und Sortierung prüfen
+        (\nCEVENT = ) print cevent circle-events-print
         cevent circle-event-get-point
         voronoi-edge-new
         /edge exch def
 
         % arc = circle_event.arc
         /arc cevent circle-event-get-arc def
+        (\nARC = ) print arc parabola-arc-print
 
         % delete corresponding parabola arc
         arc parabola-arc-get-previous null ne
@@ -988,12 +1022,12 @@ lw setlinewidth
 % Punkte
 /points
 [
-%    [40.958 77.998]
-%    [39.257 23.810]
-%    [38.560 52.197]
-%    [29.689 27.931]
-%    [20.042 67.723]
-%    [19.844 4.945]
+    [40.958 77.998]
+    [39.257 23.810]
+    [38.560 52.197]
+    [29.689 27.931]
+    [20.042 67.723]
+    [19.844 4.945]
     [18.093 10.194]
     [17.828 14.802]
     [13.757 63.445]

@@ -26,7 +26,7 @@
 /ppitem {                % item
 %    (| ) print
     dup type exec
-    ( ---- ) print
+    ( * ) print
 } def
 
 /nametype    { (/) print (         ) cvs print } def
