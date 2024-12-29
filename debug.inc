@@ -1,9 +1,11 @@
-/log-stack {              % fname
+%
+% helper functions for logging
+%
+/log-stack {             % fname
     (\n) print
     print
     ( ) print
     print-stack
-    %pstack
 } def
 
 /print-stack {           % STACK
@@ -24,7 +26,6 @@
 } def
 
 /ppitem {                % item
-%    (| ) print
     dup type exec
     ( * ) print
 } def
