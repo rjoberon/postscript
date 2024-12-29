@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0
 
 % includes
-% (sort.inc) run
+(sort.inc) run
 (debug.inc) run
 
 % Koordinatensystem initialisieren
@@ -138,10 +138,19 @@ lw setlinewidth
     get                  % cevent_n
 } def
 /circle-events-sort {    %
-    ( IMPLEMENT:sort ) print
-    % FIXME: implement
-    quit
+    (<circle-events-sort>) log-stack
+    /circle-events-comp  % /circle-events-comp
+    circle-events 0 get  % /circle-events-comp cevents
+    quicksort            % sorted_cevents  % inplace!
 } def
+/circle-events-comp {    % x y
+    % return truth of x < y with both being circle-events
+    circle-event-get-x   % x y.x
+    exch                 % y.x x
+    circle-event-get-x   % y.x x.x
+    gt                   % y.x > x.x
+} def
+
 
 
 % Parabola Arc
@@ -169,6 +178,7 @@ lw setlinewidth
 /parabola-arc-set-edge1    {4 exch put} def
 /parabola-arc-set-edge2    {5 exch put} def
 /point-print {           % [px py]
+    ([) print
     aload pop            % px py
     exch                 % py px
     (         ) cvs print% py
@@ -236,7 +246,7 @@ lw setlinewidth
 /voronoi-edges [ [] ] def
 % FIXME: generalize for other objects (i.e., voronoi edges)
 /voronoi-edges-append {  % vedge
-    (\nADD EDGE:) print
+    (\nADD EDGE: ) print
     dup voronoi-edge-get-point1 ppitem
     dup voronoi-edge-get-point2 ppitem
 
@@ -277,10 +287,10 @@ lw setlinewidth
 
     % loop over points
     {
-        (<fortune loop>) log-stack
         % while len(fortune.points) > 0:
         counttomark      % len(fortune.points)
         0 le { exit } if % <= 0 → exit loop
+        (<fortune loop>) log-stack
         % if ...
         circle-events-len
         0 gt             % |cevents| > 0
@@ -303,7 +313,6 @@ lw setlinewidth
     % after all points are processed, finish remaining circle events
     {
         circle-events-len
-        (<diese Aufraeum-Schleife am Ende>) log-stack
         0 le { exit } if
         process-circle-event
     } loop
@@ -429,7 +438,7 @@ lw setlinewidth
             arc null eq {% exit when arc is null
                 true exit% proceed after loop
             } if
-           (\n---------------------> ROOT ARC: ) print arc parabola-arc-print (\n) print
+           (\n---------------------> ROOT ARC: ) print arc parabola-arc-print
             % check for intersection
             [px py] arc get-intersection
             {            % [i1x i1y]
@@ -453,7 +462,7 @@ lw setlinewidth
                 } ifelse
                 and      % [i1x i1y] != and !=
                 {
-                    (\n---------------------> ARC: ) print arc parabola-arc-get-next parabola-arc-print (\n) print
+                    (\n---------------------> ARC: ) print arc parabola-arc-get-next parabola-arc-print
 
                     % build new parabola arc ...
                     arc parabola-arc-get-point
@@ -533,7 +542,6 @@ lw setlinewidth
                 arc                           px check-circle-event
                 arc parabola-arc-get-previous px check-circle-event
                 arc parabola-arc-get-next     px check-circle-event
-                (\nDONE HERE\n) print
                 false exit% finish after loop
             } if
         } loop
@@ -614,7 +622,7 @@ lw setlinewidth
     null ne
     and
     {
-        (\nCHECK-CIRCLE-EVENT ARC = ) print arc parabola-arc-print (\n) print
+        (\nCHECK-CIRCLE-EVENT ARC = ) print arc parabola-arc-print
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
@@ -655,7 +663,7 @@ lw setlinewidth
 %   [px py] x true
 %
 /get-rightmost-circle-point { % [p1x p1y] [p2x p2y] [p3x p3y]
-    (get-rightmost-circle-point) log-stack
+    (<get-rightmost-circle-point>) log-stack
     12 dict begin
     % process arguments
     aload pop /p3y exch def /p3x exch def
@@ -945,12 +953,12 @@ lw setlinewidth
     % extend each new edge to the intersection with the new parabola
     /arc root-get def
     {
-        (\nfinish-edges ARC = ) print arc parabola-arc-print (\n) print
         arc parabola-arc-get-next
         null eq
         {
             exit
         } if
+        (\nfinish-edges ARC = ) print arc parabola-arc-print
         arc parabola-arc-get-edge2
         null ne
         {
@@ -967,7 +975,7 @@ lw setlinewidth
         /arc arc parabola-arc-get-next def
     } loop
     end
-    (\n</finish-edges>\n) print
+%    (\n</finish-edges>\n) print
 } def
 
 
@@ -1035,6 +1043,9 @@ def
 %points {draw-point-a} forall
 % fortune = Fortune(points)
 points 0 0 80 80 fortune
+
+(\nedges = ) print
+voronoi-edges 0 get {([) print dup 0 get point-print (-) print 1 get point-print (] ) print} forall
 
 voronoi-edges 0 get {draw-vedge} forall
 points {draw-point-a} forall
