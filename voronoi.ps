@@ -542,13 +542,17 @@ lw setlinewidth
                 arc                           px check-circle-event
                 arc parabola-arc-get-previous px check-circle-event
                 arc parabola-arc-get-next     px check-circle-event
+                (\n--- entscheidendes return ---) print
                 false exit% finish after loop
             } if
+            /arc arc parabola-arc-get-next def
+            (\n--- Loop-Ende ---) print
         } loop
         {   % proceed after loop?
             %
             % special case: if the parabola arc does not intersect with
             % another arc it will be added to the doubly linked list
+            (\nafter loop\n) print
             /arc root-get def
             {
                 % determine last parabola arc
@@ -990,7 +994,7 @@ lw setlinewidth
 %    [29.689 27.931]
 %    [20.042 67.723]
 %    [19.844 4.945]
-%    [18.093 10.194]
+    [18.093 10.194]
     [17.828 14.802]
     [13.757 63.445]
     [12.985 40.466]
