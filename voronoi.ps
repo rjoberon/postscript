@@ -3,6 +3,7 @@
 % includes
 (sort.inc) run
 (debug.inc) run
+/log-stack { pop } def
 
 % Koordinatensystem initialisieren
 % Einheit: 1mm
@@ -270,7 +271,6 @@ lw setlinewidth
 /voronoi-edges [ [] ] def
 % FIXME: generalize for other objects (i.e., voronoi edges)
 /voronoi-edges-append {  % vedge
-    (\nADD EDGE: ) print
     dup voronoi-edge-get-point1 ppitem
     dup voronoi-edge-get-point2 ppitem
 
@@ -319,9 +319,7 @@ lw setlinewidth
         circle-events-len
         0 gt             % |cevents| > 0
         { % len(fortune.circle_events) > 0
-            circle-events-print-all
             0 circle-events-get
-            dup (\n---- ---- ---- ) print circle-events-print
             circle-event-get-x
             1 index      % cevents[0].x [px py]
             0 get le     % cevents[0].x <= px
@@ -369,24 +367,16 @@ lw setlinewidth
     (<process-circle-event>) log-stack
     3 dict begin
 
-    circle-events-print-all % DEBUG
-
     /cevent circle-events-pop def
 
     cevent circle-event-is-valid
     {
-        (\nis_valid) print
-        % edge = VoronoiEdge(circle_event.point) # new edge
-        % FIXME: das scheint das falsche circle-event zu sein → funktioniert Sortierung?
-        % ---> Ausgabe der ganzen Liste und Sortierung prüfen
-        (\nCEVENT = ) print cevent circle-events-print
         cevent circle-event-get-point
         voronoi-edge-new
         /edge exch def
 
         % arc = circle_event.arc
         /arc cevent circle-event-get-arc def
-        (\nARC = ) print arc parabola-arc-print
 
         % delete corresponding parabola arc
         arc parabola-arc-get-previous null ne
@@ -472,7 +462,6 @@ lw setlinewidth
             arc null eq {% exit when arc is null
                 true exit% proceed after loop
             } if
-           (\n---------------------> ROOT ARC: ) print arc parabola-arc-print
             % check for intersection
             [px py] arc get-intersection
             {            % [i1x i1y]
@@ -496,8 +485,6 @@ lw setlinewidth
                 } ifelse
                 and      % [i1x i1y] != and !=
                 {
-                    (\n---------------------> ARC: ) print arc parabola-arc-get-next parabola-arc-print
-
                     % build new parabola arc ...
                     arc parabola-arc-get-point
                     arc
@@ -511,8 +498,6 @@ lw setlinewidth
                     % arc.next_arc = ...
                     arc parabola-arc-get-next parabola-arc-get-previous
                     arc exch parabola-arc-set-next
-                    % FIXME: warum hier NULL und in voronoi.py nicht?
-                    %("\nSETTING NEXT TO ") print arc parabola-arc-get-next print ("\n") print
                 } {
                     arc
                     % build new parabola arc ...
@@ -541,12 +526,6 @@ lw setlinewidth
                 parabola-arc-set-next
                 % arc = arc.next_arc
                 /arc arc parabola-arc-get-next def
-                % FIXME: log-stack
-                %arc 0 get% [px py]
-                %aload pop% px py
-                %exch     % py px
-                %(\nARC px = ) print (        ) cvs print
-                %(\nARC py = ) print (        ) cvs print (\n) print
 
                 % connect two new edges with the endpoints of the parabola arc
                 % arc.edge1 = VoronoiEdge(intersection1)
@@ -576,17 +555,14 @@ lw setlinewidth
                 arc                           px check-circle-event
                 arc parabola-arc-get-previous px check-circle-event
                 arc parabola-arc-get-next     px check-circle-event
-                (\n--- entscheidendes return ---) print
                 false exit% finish after loop
             } if
             /arc arc parabola-arc-get-next def
-            (\n--- Loop-Ende ---) print
         } loop
         {   % proceed after loop?
             %
             % special case: if the parabola arc does not intersect with
             % another arc it will be added to the doubly linked list
-            (\nafter loop\n) print
             /arc root-get def
             {
                 % determine last parabola arc
@@ -660,7 +636,6 @@ lw setlinewidth
     null ne
     and
     {
-        (\nCHECK-CIRCLE-EVENT ARC = ) print arc parabola-arc-print
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
@@ -996,7 +971,6 @@ lw setlinewidth
         {
             exit
         } if
-        (\nfinish-edges ARC = ) print arc parabola-arc-print
         arc parabola-arc-get-edge2
         null ne
         {
@@ -1022,6 +996,7 @@ lw setlinewidth
 % Punkte
 /points
 [
+    [60 20]
     [40.958 77.998]
     [39.257 23.810]
     [38.560 52.197]
@@ -1032,6 +1007,7 @@ lw setlinewidth
     [17.828 14.802]
     [13.757 63.445]
     [12.985 40.466]
+    [1 2]
 ]
 def
 
