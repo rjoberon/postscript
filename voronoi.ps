@@ -2,7 +2,7 @@
 
 % includes
 (sort.inc) run
-(debug.inc) run
+% (debug.inc) run
 /log-stack { pop } def
 
 % Koordinatensystem initialisieren
@@ -271,9 +271,6 @@ lw setlinewidth
 /voronoi-edges [ [] ] def
 % FIXME: generalize for other objects (i.e., voronoi edges)
 /voronoi-edges-append {  % vedge
-    dup voronoi-edge-get-point1 ppitem
-    dup voronoi-edge-get-point2 ppitem
-
     [ exch ]             % [vedge]
     voronoi-edges 0 get  % [vedge] [...]
     exch                 % [...] [vedge]
