@@ -1,20 +1,30 @@
 %!PS-Adobe-2.0
 
+%
+% Computation of Voronoi diagrams using Fortune's algorithm.
+%
+% Code based on my Python re-implementation of a C# re-implementation¹
+% of Matt Brubeck's C++ implementation.²
+%
+% ¹ https://de.wikipedia.org/wiki/Voronoi-Diagramm#Algorithmus_von_Fortune
+% ² https://web.archive.org/web/20200809223746/https://www.cs.hmc.edu/~mbrubeck/voronoi.html
+
 % includes
 (sort.inc) run
-% (debug.inc) run
-/log-stack { pop } def
+% (debug.inc) run       % include to enable log output
+/log-stack { pop } def  % disable log output
 
-% Koordinatensystem initialisieren
-% Einheit: 1mm
-% Überlegung: 72 Postscript-Punkte sind ein Zoll, ein Zoll sind 25,4 mm
+% initialize coordinate system
+% unit: 1mm
+% 72 postscript points are one inch, one inch are 25,4 mm
 2.8346456692 2.8346456692 scale
 10 10 translate
 
-% Standard-Linienbreite: 1/4 mm
-/lw 0.25 def
-lw setlinewidth
+% standard line width: 1/4 mm
+0.25 setlinewidth
 
+% drawing routines for points and edges
+%
 % draw a point at (x,y) as a circle with radius r
 /draw-point {            % x y r
     3 1 roll             % r x y
@@ -28,7 +38,6 @@ lw setlinewidth
         stroke
     grestore
 } def
-
 % draw a point given as array [x y] at (x,y) as a circle with radius 5
 /draw-point-a {          % [x y]
     aload                % x y [x y]
@@ -36,7 +45,6 @@ lw setlinewidth
     1                    % x y 5
     draw-point
 } def
-
 % draw an edge from (x1, y1) to (x2, y2)
 /draw-vedge {             % [[x1 y1] [x2 y2] true]
     aload pop pop         % [x1 y1] [x2 y2]
@@ -50,11 +58,9 @@ lw setlinewidth
     grestore
 } def
 
-
-% Funktionen für Datenstrukturen
-
+% array operations
 %
-% input: [a1 a2 ... an] [b1 b2 ... bm]
+% input:  [a1 a2 ... an] [b1 b2 ... bm]
 % output: [a1 a2 ... an b1 b2 .. bm]
 %
 /arr-concat {            % [a1 a2 ... an] [b1 b2 ... bm] → [a1 a2 ... an b1 b2 .. bm]
@@ -67,23 +73,8 @@ lw setlinewidth
     copy length exch     % [...] [...] [b1 b2 ... bm] n+m [a1 a2 ... an]
     putinterval          % [a1 a2 ... an b1 b2 .. bm]
 } def
-
 %
-% input: [a1 a2 ... an]
-% output: [a1 a2 ... ] an
-%
-/arr-pop {               % [a1 a2 ... an] → [a1 a2 ... ] an
-    dup dup length       % [a1 a2 ... an] [a1 a2 ... an] n
-    1 sub dup            % [a1 a2 ... an] [a1 a2 ... an] n-1 n-1
-    3 1 roll             % [a1 a2 ... an] n-1 [a1 a2 ... an] n-1
-    get                  % [a1 a2 ... an] n-1 an
-    3 1 roll             % an [a1 a2 ... an] n-1
-    0 exch               % an [a1 a2 ... an] 0 n-1
-    getinterval          % an [a1 a2 ... ]
-    exch                 % [a1 a2 ... ] an
-} def
-%
-% input: [a1 a2 ... an]
+% input:  [a1 a2 ... an]
 % output: [a2 ... an] a1
 %
 /arr-pop0 {              % [a1 a2 ... an] → [a2 ... an] a1
@@ -97,11 +88,8 @@ lw setlinewidth
     exch                 % [a2 ... an] an
 } def
 
-% Datenstrukturen:
-% - points → stack
-% - edges → list
-% - circle_events → priority queue (stets sortiert)
-
+% data structures
+%
 % Circle Event
 %
 % Constructor.
@@ -280,7 +268,6 @@ lw setlinewidth
     put
 } def
 
-
 % Root
 %
 /root [ null ] def
@@ -339,7 +326,7 @@ lw setlinewidth
     } loop
 
     x1 y1 x2 y2 finish-edges
-    pop % remove -mark-
+    pop                  % remove -mark-
     end
 } def
 
@@ -575,7 +562,6 @@ lw setlinewidth
             parabola-arc-set-next
             % add edge between parabola arcs
             [
-            %XXX:
                 arc parabola-arc-get-next parabola-arc-get-point 1 get
                 arc parabola-arc-get-point 1 get
                 add
@@ -636,11 +622,6 @@ lw setlinewidth
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
-        % FIXME: hier weiter suchen; Problem ist: die drei Eingabe-Punkte in voronoi.ps sind:
-        % P1: [12.985 40.466 ], P2: [13.757 63.445 ], P3: [17.828 14.802 ]
-        % in voronoi.py sind sie jedoch
-        % P1: [178.28, 148.02], P2: [129.85, 404.66], P3: [137.57, 634.45]
-        % die Reihenfolge stimmt also nicht! :-(
         get-rightmost-circle-point
         {                % [px py] x
             dup x        % [px py] x x _x
@@ -652,7 +633,6 @@ lw setlinewidth
                 arc exch % cevent arc cevent
                 parabola-arc-set-cevent
                          % cevent
-                % FIXME: add args for next two calls (if necessary)
                 circle-events-append
                 circle-events-sort
             } if
@@ -748,7 +728,6 @@ lw setlinewidth
     } ifelse
     end
 } def
-
 
 %
 % Compute intersection between parabola with given focal point and
@@ -925,7 +904,7 @@ lw setlinewidth
     } ifelse
     % result of all ifelse: iy on top of stack
     % now on stack:         px py iy
-    /iy exch def            % FIXME: those three defs can be removed
+    /iy exch def            % FIXME: those three defs could be removed
     /py exch def
     /px exch def
 
@@ -987,13 +966,9 @@ lw setlinewidth
 %    (\n</finish-edges>\n) print
 } def
 
-
-
-
-% Punkte
+% actual data
 /points
 [
-    [60 20]
     [40.958 77.998]
     [39.257 23.810]
     [38.560 52.197]
@@ -1004,65 +979,21 @@ lw setlinewidth
     [17.828 14.802]
     [13.757 63.445]
     [12.985 40.466]
-    [1 2]
 ]
 def
 
+% TODO: implement points.sort()
 
-
-
-% Kanten
-/edges_orig
-[
-    [[-328.620 63.445] [23.347 51.620] true]
-    [[-328.620 63.445] [-827074.763 27838.719] true]
-    [[-52.593 14.802] [-101.080 5.652] true]
-    [[-52.593 14.802] [16.577 27.855] true]
-    [[-22.103 10.194] [-101.080 5.652] true]
-    [[-22.103 10.194] [31.087 13.253] true]
-    [[-101.080 5.652] [-32840.501 -5518.693] true]
-    [[11.101 4.945] [-8491.394 -2831.380] true]
-    [[11.101 4.945] [31.956 11.902] true]
-    [[15.444 67.723] [24.569 54.316] true]
-    [[15.444 67.723] [-578.961 940.989] true]
-    [[16.634 27.931] [16.577 27.855] true]
-    [[16.634 27.931] [27.544 42.470] true]
-    [[16.577 27.855] [30.075 15.660] true]
-    [[23.608 52.197] [23.347 51.620] true]
-    [[23.608 52.197] [24.569 54.316] true]
-    [[23.347 51.620] [27.544 42.470] true]
-    [[24.569 54.316] [34.053 65.628] true]
-    [[33.586 23.810] [30.075 15.660] true]
-    [[33.586 23.810] [39.707 38.023] true]
-    [[27.976 77.998] [34.053 65.628] true]
-    [[27.976 77.998] [-323.933 794.352] true]
-    [[27.544 42.470] [39.707 38.023] true]
-    [[30.075 15.660] [31.087 13.253] true]
-    [[31.087 13.253] [31.956 11.902] true]
-    [[31.956 11.902] [214.406 -175.848] true]
-    [[34.053 65.628] [270.177 43.682] true]
-    [[39.707 38.023] [270.177 43.682] true]
-    [[270.177 43.682] [259.165 44.028] true]
-]
-def
-
-%1 0 0 setrgbcolor
-% edges {draw-vedge} forall
-
-% TODO: points.sort()
-% draw points
-%points {draw-point-a} forall
-% fortune = Fortune(points)
+% compute edges
 points 0 0 80 80 fortune
 
-(\nedges = ) print
+% print edges
 voronoi-edges 0 get {([) print dup 0 get point-print (-) print 1 get point-print (] ) print} forall
 
-voronoi-edges 0 get {draw-vedge} forall
+% draw points
 points {draw-point-a} forall
+1 0 0 setrgbcolor
+% draw edges
+voronoi-edges 0 get {draw-vedge} forall
 
-( DONE ) print
-% pstack
-
-
-% showpage
+showpage
