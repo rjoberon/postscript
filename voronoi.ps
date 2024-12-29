@@ -168,6 +168,38 @@ lw setlinewidth
 /parabola-arc-set-cevent   {3 exch put} def
 /parabola-arc-set-edge1    {4 exch put} def
 /parabola-arc-set-edge2    {5 exch put} def
+/point-print {           % [px py]
+    aload pop            % px py
+    exch                 % py px
+    (         ) cvs print% py
+    ( ) print
+    (         ) cvs print% py
+    (]) print
+} def
+/parabola-arc-print-null {% arc
+    dup null eq {
+        (null) print
+        pop
+    } {
+        ([) print
+        0 get
+        point-print
+        ( ...) print
+        (]) print
+    } ifelse
+} def
+/parabola-arc-print {    % arc
+    ([) print
+    dup 0 get            % arc [px py]
+    point-print
+    ( ) print
+    dup 1 get            % arc previous_arc
+    parabola-arc-print-null
+    2 get                % next_arc
+    ( ) print
+    parabola-arc-print-null
+    (]) print
+} def
 
 % Voronoi Edge
 %
@@ -397,6 +429,7 @@ lw setlinewidth
             arc null eq {% exit when arc is null
                 true exit% proceed after loop
             } if
+           (\n---------------------> ROOT ARC: ) print arc parabola-arc-print (\n) print
             % check for intersection
             [px py] arc get-intersection
             {            % [i1x i1y]
@@ -420,17 +453,23 @@ lw setlinewidth
                 } ifelse
                 and      % [i1x i1y] != and !=
                 {
-                    arc parabola-arc-get-next
+                    (\n---------------------> ARC: ) print arc parabola-arc-get-next parabola-arc-print (\n) print
+
                     % build new parabola arc ...
                     arc parabola-arc-get-point
                     arc
                     arc parabola-arc-get-next
                     parabola-arc-new
-                    dup  % copy second assignment
                     % arc.next_arc.previous_arc = ...
+                    arc parabola-arc-get-next
+                    exch
                     parabola-arc-set-previous
+
                     % arc.next_arc = ...
+                    arc parabola-arc-get-next parabola-arc-get-previous
                     arc exch parabola-arc-set-next
+                    % FIXME: warum hier NULL und in voronoi.py nicht?
+                    %("\nSETTING NEXT TO ") print arc parabola-arc-get-next print ("\n") print
                 } {
                     arc
                     % build new parabola arc ...
@@ -448,7 +487,6 @@ lw setlinewidth
 
                 % insert new parabola arc between arc and arc.next_arc
                 % arc.next_arc.previous_arc = ParabolaArc(point, arc, arc.next_arc)
-                % FIXME: hier weiter bei .next() ist Stack defekt
                 arc parabola-arc-get-next
                 [px py] arc arc parabola-arc-get-next
                 parabola-arc-new
@@ -576,6 +614,7 @@ lw setlinewidth
     null ne
     and
     {
+        (\nCHECK-CIRCLE-EVENT ARC = ) print arc parabola-arc-print (\n) print
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
@@ -906,6 +945,7 @@ lw setlinewidth
     % extend each new edge to the intersection with the new parabola
     /arc root-get def
     {
+        (\nfinish-edges ARC = ) print arc parabola-arc-print (\n) print
         arc parabola-arc-get-next
         null eq
         {
