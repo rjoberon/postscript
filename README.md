@@ -8,8 +8,10 @@ A small collection of examples (more for learning programming than for viewing).
   similarity](https://en.wikipedia.org/wiki/Cosine_similarity). A joke
   that was laser-printed on transparency and attached to the doctoral
   cap for [Dominik Benz](https://www.kde.cs.uni-kassel.de/benz).
-- [ean.ps](ean.ps): Draws a [European Article Number](https://en.wikipedia.org/wiki/International_Article_Number).
-- [gleiche_breite.ps](gleiche_breite.ps)
+- [ean.ps](ean.ps): Draws the barcode for [European Article
+  Numbers](https://en.wikipedia.org/wiki/International_Article_Number).
+- [gleiche_breite.ps](gleiche_breite.ps): Automatically scaling words
+  to the same printed width. Unfinished.
 - [macmahon.ps](macmahon.ps): Visualization of the 30 [MacMahon's Cubes](https://library.ethz.ch/en/locations-and-media/platforms/virtual-exhibitions/Its-all-math-and-games/macmahons-cubes.html).
 - [personalausweis.ps](personalausweis.ps)
 - [planzeiger.ps](planzeiger.ps): A handy tool to measure distances
