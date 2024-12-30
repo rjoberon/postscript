@@ -14,8 +14,9 @@ A small collection of examples (more for learning programming than for viewing).
   to the same printed width. Unfinished.
 - [macmahon.ps](macmahon.ps): Visualization of the 30 [MacMahon's Cubes](https://library.ethz.ch/en/locations-and-media/platforms/virtual-exhibitions/Its-all-math-and-games/macmahons-cubes.html).
 - [personalausweis.ps](personalausweis.ps)
-- [planzeiger.ps](planzeiger.ps): A handy tool to measure distances
-  and angles on printed maps. Works well laser-printed on
+- [planzeiger.ps](planzeiger.ps): A [reference
+  card](https://en.wikipedia.org/wiki/Romer_(tool)) to measure
+  distances and angles on printed maps. Works well laser-printed on
   transparency.
 - [random.ps](random.ps): An approach to initialize the pseudo-random
   number generator with some device entropy.
