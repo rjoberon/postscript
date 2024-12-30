@@ -10,9 +10,9 @@
 % ² https://web.archive.org/web/20200809223746/https://www.cs.hmc.edu/~mbrubeck/voronoi.html
 
 % includes
-(sort.inc) run
-% (debug.inc) run       % include to enable log output
-/log-stack { pop } def  % disable log output
+% (sort.inc) run         % is embedded, see below
+% (debug.inc) run        % include to enable log output
+/log-stack { pop } def   % disable log output
 
 % initialize coordinate system
 % unit: 1mm
@@ -20,8 +20,90 @@
 2.8346456692 2.8346456692 scale
 10 10 translate
 
-% standard line width: 1/4 mm
-0.25 setlinewidth
+0.25 setlinewidth        % standard line width: 1/4 mm
+
+% Quicksort implementation from Bill Casselman
+% https://personal.math.ubc.ca/~cass/graphics/manual/code/sort.inc
+/qsortdict 8 dict def
+qsortdict begin
+% args: /comp a L R x
+% effect: effects a partition into two pieces [L j] [i R]
+%     leaves i j on stack
+/partition { 8 dict begin
+/x exch def
+/j exch def
+/i exch def
+/a exch def
+load /comp exch def
+{
+  {
+    a i get x comp exec not {
+      exit
+    } if
+    /i i 1 add def
+  } loop
+  {
+    x a j get comp exec not {
+      exit
+    } if
+    /j j 1 sub def
+  } loop
+
+  i j le {
+    % swap a[i] a[j]
+    a j a i get
+    a i a j get
+    put put
+    /i i 1 add def
+    /j j 1 sub def
+  } if
+  i j gt {
+    exit
+  } if
+} loop
+i j
+end } def
+% args: /comp a L R
+% effect: sorts a[L .. R] according to comp
+/subsort {               % /c a L R
+    [ 3 1 roll ] 3 copy  % /c a [L R] /c a [L R]
+    aload aload pop      % /c a [L R] /c a L R L R
+    add 2 idiv           % /c a [L R] /c a L R (L+R)/2
+    3 index exch get     % /c a [L R] /c a L R x
+    partition            % /c a [L R] i j
+    % if j > L subsort(a, L, j)
+    dup                  % /c a [L R] i j j
+    3 index 0 get gt {   % /c a [L R] i j
+        5 copy           % /c a [L R] i j /c a [L R] i j
+        exch pop         % /c a [L R] i j /c a [L R] j
+        exch 0 get exch  % ... /c a L j
+        subsort
+    } if                 % /c a [L R] i j
+    pop dup              % /c a [L R] i i
+    % if i < R subsort(a, i, R)
+    2 index 1 get lt {   % /c a [L R] i
+        exch 1 get       % /c a i R
+        subsort
+    }{
+        4 { pop } repeat
+    } ifelse
+} def
+end
+% args: /comp a
+% effect: sorts the array a
+% comp returns truth of x < y for entries in a
+/quicksort {
+    qsortdict begin
+    dup length 1 gt {    % /comp a
+        dup              % /comp a a
+        length 1 sub     % /comp a n-1
+        0 exch subsort
+    } {
+        pop pop
+    } ifelse
+    end
+} def
+
 
 % drawing routines for points and edges
 %
@@ -44,8 +126,8 @@
     1 draw-point         %
 } def
 % draw an edge from (x1, y1) to (x2, y2)
-/draw-vedge {             % [[x1 y1] [x2 y2] true]
-    aload pop pop         % [x1 y1] [x2 y2]
+/draw-edge {             % [[x1 y1] [x2 y2]]
+    aload pop            % [x1 y1] [x2 y2]
     gsave
         exch             % [x2 y2] [x1 y1]
         aload pop        % [x2 y2] x1 y1
@@ -287,7 +369,13 @@
     } loop
 
     x1 y1 x2 y2 finish-edges
-    pop                  % remove -mark-
+
+    % simplify edges (remove status flag)
+    [
+        voronoi-edges aload pop
+        { [ exch aload pop pop ] } forall
+    ]
+    exch pop             % remove -mark-
     end
 } def
 
@@ -942,12 +1030,13 @@ def
 points 0 0 80 80 fortune
 
 % print edges
-voronoi-edges 0 get {([) print dup 0 get point-print (-) print 1 get point-print (] ) print} forall
+% dup {([) print dup 0 get point-print (-) print 1 get point-print (] ) print} forall
 
 % draw points
 points {draw-point-a} forall
-1 0 0 setrgbcolor
+
 % draw edges
-voronoi-edges 0 get {draw-vedge} forall
+1 0 0 setrgbcolor
+{draw-edge} forall
 
 showpage
