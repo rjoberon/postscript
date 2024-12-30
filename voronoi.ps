@@ -103,6 +103,23 @@ end
     end
 } def
 
+% comparator for points
+%
+% input:  [px py] [qx qy]
+% output: [px py] < [qx qy]
+/points-comp {           % [px py] [qx qy]
+    2 dict begin
+    % process arguments
+    /p exch def
+    /q exch def
+    p 0 get q 0 get lt   % px<qx
+    p 0 get q 0 get eq   % px<qx px=qx
+    p 1 get q 1 get lt   % px<qx px=qx py<qy
+    and                  % px<qx (px=qx and py<qy)
+    or                   % px<qx or (px=qx and py<qy)
+    end
+} def
+
 
 % drawing routines for points and edges
 %
@@ -225,6 +242,9 @@ end
     circle-events 0 get  % /circle-events-comp cevents
     quicksort            % sorted_cevents  % inplace!
 } def
+% comparator for circle events
+% input:  x y
+% output: x > y
 /circle-events-comp {    % x y
     % return truth of x < y with both being circle-events
     circle-event-get-x   % x y.x
@@ -317,6 +337,9 @@ end
 /root-get {root 0 get} def
 /root-set {root 0 3 -1 roll put} def
 
+%
+% Fortune's algorithm starts here
+%
 
 %
 % input: [[pnx pny] ... [p1x p1y]]
@@ -1007,27 +1030,46 @@ end
     end
 } def
 
-% actual data
-/points
-[
-    [40.958 77.998]
-    [39.257 23.810]
-    [38.560 52.197]
-    [29.689 27.931]
-    [20.042 67.723]
-    [19.844 4.945]
-    [18.093 10.194]
-    [17.828 14.802]
-    [13.757 63.445]
-    [12.985 40.466]
-]
-def
+% an attempt to produce truly random numbers
+/getrandseed {
+    (%Calendar%) /IODevice resourcestatus {
+        pop pop (%Calendar%) currentdevparams
+        dup /Running get {
+            % cal
+            dup
+            % cal cal
+            /Year get
+            % cal Year
+            2 1 roll dup /Month get	3 2 roll add
+            % cal Month+Year
+            2 1 roll dup /Day get 3 2 roll add
+            % cal Day+Month+Year
+            2 1 roll dup /Hour get 3 2 roll add
+            % cal Hour+Day+Month+Year
+            2 1 roll dup /Minute get 100 add 3 2 roll add
+            % cal Minute+Hour+Day+Month+Year
+            2 1 roll dup /Second get 100 add 3 2 roll add
+            % cal Second+Minute+Hour+Day+Month+Year
+            exch pop
+            % Second+Minute+Hour+Day+Month+Year
+            % do: x[n+1] = (16807 * x[n]) mod (2^31 - 1)
+            16807 mul
+            2147483647 mod
+        } {
+            (Clock/calendar is present but not running.\n) show
+        } ifelse
+    } {
+        (No clock/calendar present.\n) show
+    } ifelse
+} def
 
 % a random number between 0 and 1
 /rfloat {
     rand 16#7fffffff div
 } def
 
+% a random point in the ranges [0 limx] and [0 limy]
+%
 % input:  limx limy
 % output: [randx randy]
 /rpoint {                % limx limy
@@ -1039,48 +1081,18 @@ def
         3 1 roll         % [ randx randy
     ]                    % [ randx randy ]
 } def
-% input:  [px py] [qx qy]
-% output: [px py] < [qx qy]
-/cpointx {
-    0 get                % [px py] qx
-    exch                 % qx [px py]
-    0 get                % qx px
-    lt
-} def
-/cpoint {                % [px py] [qx qy]
-    dup 0 get            % [px py] [qx qy] qx
-    2 index              % [px py] [qx qy] qx [px py]
-    0 get                % [px py] [qx qy] qx px
-    2 copy               % [px py] [qx qy] qx px qx px
-    ge                   % [px py] [qx qy] qx px qx>=px
-    {                    % [px py] [qx qy] qx px
-        eq               % [px py] [qx qy] qx=px
-        {                % [px py] [qx qy]
-            1 get        % [px py] qy
-            exch         % qy [px py]
-            1 get        % qy py
-            ge           % qy>=py
-        } {              % [px py] [qx qy]
-            pop pop      %
-            true         % true
-        } ifelse
-    } {                  % [px py] [qx qy] qx px
-        pop pop
-        pop pop
-        false
-    } ifelse
-} def
 
+%
+% here the actual configuration and running of code starts
+%
+
+/nopoints 100 def        % number of points
 % limits for points (in mm)
 /limx 210 def            % A4 page width
 /limy 297 def            % A4 page height
 
-% number of random points
-/nopoints 100 def
-233 srand
-
-% generate random points
-/points
+getrandseed srand        % initialize RNG
+/points                  % generate random points
 [
     nopoints {
         limx limy rpoint
@@ -1089,7 +1101,7 @@ def
 def
 
 % sort points
-/cpointx points quicksort
+/points-comp points quicksort
 
 % compute edges
 points 0 0 limx limy fortune
