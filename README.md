@@ -4,9 +4,10 @@ A small collection of examples (more for learning programming than for viewing).
   using cubic splines.
 - [color.ps](color.ps): Fills the page with squares of random colors.
 - [cosinus_winkelmesser.ps](cosinus_winkelmesser.ps): A goniometer for
-  measuring textual similarity using the cosine measure. A joke that
-  was laser-printed on transparency and glued to the doctoral cap for
-  [Dominik Benz](https://www.kde.cs.uni-kassel.de/benz).
+  measuring [cosine
+  similarity](https://en.wikipedia.org/wiki/Cosine_similarity). A joke
+  that was laser-printed on transparency and attached to the doctoral
+  cap for [Dominik Benz](https://www.kde.cs.uni-kassel.de/benz).
 - [ean.ps](ean.ps): Draws a [European Article Number](https://en.wikipedia.org/wiki/International_Article_Number).
 - [gleiche_breite.ps](gleiche_breite.ps)
 - [macmahon.ps](macmahon.ps): Visualization of the 30 [MacMahon's Cubes](https://library.ethz.ch/en/locations-and-media/platforms/virtual-exhibitions/Its-all-math-and-games/macmahons-cubes.html).
