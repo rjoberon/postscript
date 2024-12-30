@@ -1,4 +1,5 @@
 %!PS-Adobe-2.0
+%%Pages: 1
 
 %
 % Computation of Voronoi diagrams using Fortune's algorithm.
@@ -13,6 +14,9 @@
 % (sort.inc) run         % is embedded, see below
 % (debug.inc) run        % include to enable log output
 /log-stack { pop } def   % disable log output
+
+% set page size to A4 portrait
+<< /PageSize [595.3 841.9] >> setpagedevice
 
 % initialize coordinate system
 % unit: 1mm
