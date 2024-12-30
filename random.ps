@@ -7,7 +7,7 @@
 % largest number
 /mymax 20 def
 
-/getrand {
+/getrandseed {
     (%Calendar%) /IODevice resourcestatus {
         pop pop (%Calendar%) currentdevparams
         dup /Running get {
@@ -39,7 +39,9 @@
     } ifelse
 } def
 
+getrandseed srand        % initialize PRNG
+
 /Helvetica findfont 400 scalefont setfont
 10 400 moveto
-mymax getrand exch mod
+rand mymax mod
 5 string cvs show
