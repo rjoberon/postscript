@@ -44,10 +44,10 @@ jobs:
           sudo mkdir ./_site/thumb
           sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=png16m  -r37.50 -sOutputFile=./_site/thumb/bezier.png               ./bezier.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/color.png                ./color.ps
-          sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pngmono -r74.50 -sOutputFile=./_site/thumb/cosinus_winkelmesser.png ./cosinus_winkelmesser.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pnggray -r74.50 -sOutputFile=./_site/thumb/cosinus_winkelmesser.png ./cosinus_winkelmesser.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/macmahon.png             ./macmahon.ps
-          sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pngmono -r62.50 -sOutputFile=./_site/thumb/planzeiger.png           ./planzeiger.ps
-          sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pngmono -r36.00 -sOutputFile=./_site/thumb/schneeflocke.png         ./schneeflocke.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pnggray -r62.50 -sOutputFile=./_site/thumb/planzeiger.png           ./planzeiger.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pnggray -r36.00 -sOutputFile=./_site/thumb/schneeflocke.png         ./schneeflocke.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=pnggray -r36.30 -sOutputFile=./_site/thumb/spirale.png              ./spirale.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sDEVICE=png16   -r36.30 -sOutputFile=./_site/thumb/voronoi.png              ./voronoi.ps
       - name: Upload artifact

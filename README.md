@@ -1,4 +1,4 @@
-A small collection of examples (more for learning programming than for viewing).
+A small collection of examples for learning programming.
 
 ## [bezier.ps](bezier.ps)
 
@@ -11,7 +11,7 @@ Drawing parametrized two-dimensional curves using cubic splines.
 
 ![](thumb/color.png)
 
-Fills the page with squares of random colors.
+Filling the page with squares of random colors.
 
 
 ## [cosinus_winkelmesser.ps](cosinus_winkelmesser.ps)
@@ -26,7 +26,7 @@ cap for [Dominik Benz](https://www.kde.cs.uni-kassel.de/benz).
 
 ## [ean.ps](ean.ps)
 
-Draws the barcode for [European Article
+Drawing barcodes for [European Article
 Numbers](https://en.wikipedia.org/wiki/International_Article_Number).
 
 
@@ -38,13 +38,13 @@ Automatically scaling words to the same printed width. Unfinished.
 
 ![](thumb/macmahon.png)
 
-Visualization of the 30 [MacMahon's
+Visualizing the 30 [MacMahon
 Cubes](https://library.ethz.ch/en/locations-and-media/platforms/virtual-exhibitions/Its-all-math-and-games/macmahons-cubes.html).
 
 
 ## [personalausweis.ps](personalausweis.ps)
 
-Explanation of the [document number for old German identity
+Explaining the [document number for old German identity
 cards](https://de.wikipedia.org/wiki/Ausweisnummer#Personalausweis_g%C3%BCltig_bis_Oktober_2010).
 
 
@@ -52,15 +52,15 @@ cards](https://de.wikipedia.org/wiki/Ausweisnummer#Personalausweis_g%C3%BCltig_b
 
 ![](thumb/planzeiger.png)
 
-A [reference card](https://en.wikipedia.org/wiki/Romer_(tool)) to
-measure distances and angles on printed maps. Works well laser-printed
-on transparency.
+A [reference card](https://en.wikipedia.org/wiki/Romer_(tool)) for
+measuring distances and angles on printed maps. Works well
+laser-printed on transparency.
 
 
 ## [random.ps](random.ps)
 
-An approach to initialize the pseudo-random number generator with some
-device entropy.
+Initializing the pseudo-random number generator with some device
+entropy.
 
 
 ## [schneeflocke.ps](schneeflocke.ps)
@@ -87,11 +87,11 @@ Really just a triangle. Almost the simplest imaginable program.
 
 ![](thumb/voronoi.png)
 
-An implementation of [Fortune's
-algorithm](https://en.wikipedia.org/wiki/Fortune%27s_algorithm) to
-compute [Voronoi
-diagrams](https://en.wikipedia.org/wiki/Voronoi_diagram). The page
-shows randomly drawn points together with their computed Voronoi
+Computing [Voronoi
+diagrams](https://en.wikipedia.org/wiki/Voronoi_diagram) using
+[Fortune's
+algorithm](https://en.wikipedia.org/wiki/Fortune%27s_algorithm). The
+page shows randomly drawn points together with their computed Voronoi
 regions.
 
 ----
