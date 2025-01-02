@@ -41,6 +41,7 @@ jobs:
           sudo apt-get install ghostscript
       - name: Create thumbnails
         run: |
+          mkdir ./_site/thumb
           gs -sOutputFile=./_site/thumb/voronoi.png -sDEVICE=png16m ./voronoi.ps
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
