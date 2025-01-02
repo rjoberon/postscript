@@ -45,14 +45,14 @@ jobs:
       - name: Create thumbnails
         run: |
           sudo mkdir ./_site/thumb
-          sudo gs -sDEVICE=png16m  -r37.50 -sOutputFile=./_site/thumb/bezier.png               ./bezier.ps
-          sudo gs -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/color.png                ./color.ps
-          sudo gs -sDEVICE=pnggray -r74.50 -sOutputFile=./_site/thumb/cosinus_winkelmesser.png ./cosinus_winkelmesser.ps
-          sudo gs -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/macmahon.png             ./macmahon.ps
-          sudo gs -sDEVICE=pnggray -r62.50 -sOutputFile=./_site/thumb/planzeiger.png           ./planzeiger.ps
-          sudo gs -sDEVICE=pnggray -r36.00 -sOutputFile=./_site/thumb/schneeflocke.png         ./schneeflocke.ps
-          sudo gs -sDEVICE=pnggray -r36.30 -sOutputFile=./_site/thumb/spirale.png              ./spirale.ps
-          sudo gs -sDEVICE=png16   -r36.30 -sOutputFile=./_site/thumb/voronoi.png              ./voronoi.ps
+          sudo -E gs -sDEVICE=png16m  -r37.50 -sOutputFile=./_site/thumb/bezier.png               ./bezier.ps
+          sudo -E gs -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/color.png                ./color.ps
+          sudo -E gs -sDEVICE=pnggray -r74.50 -sOutputFile=./_site/thumb/cosinus_winkelmesser.png ./cosinus_winkelmesser.ps
+          sudo -E gs -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/macmahon.png             ./macmahon.ps
+          sudo -E gs -sDEVICE=pnggray -r62.50 -sOutputFile=./_site/thumb/planzeiger.png           ./planzeiger.ps
+          sudo -E gs -sDEVICE=pnggray -r36.00 -sOutputFile=./_site/thumb/schneeflocke.png         ./schneeflocke.ps
+          sudo -E gs -sDEVICE=pnggray -r36.30 -sOutputFile=./_site/thumb/spirale.png              ./spirale.ps
+          sudo -E gs -sDEVICE=png16   -r36.30 -sOutputFile=./_site/thumb/voronoi.png              ./voronoi.ps
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
