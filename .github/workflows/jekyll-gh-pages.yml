@@ -35,6 +35,10 @@ jobs:
         with:
           source: ./
           destination: ./_site
+      - name: Install GhostScript
+        run: |
+          sudo apt-get update
+          sudo apt-get install ghostscript
       - name: Create thumbnails
         run: |
           gs -sOutputFile=./_site/thumb/voronoi.png -sDEVICE=png16m ./voronoi.ps
