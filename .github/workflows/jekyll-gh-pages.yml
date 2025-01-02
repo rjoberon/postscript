@@ -35,6 +35,9 @@ jobs:
         with:
           source: ./
           destination: ./_site
+      - name: Create thumbnails
+        run: |
+          gs -sOutputFile=./_site/thumb/voronoi.png -sDEVICE=png16m ./voronoi.ps
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
