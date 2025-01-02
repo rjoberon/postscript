@@ -49,6 +49,7 @@ jobs:
           sudo -E gs -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/color.png                ./color.ps
           sudo -E gs -sDEVICE=pnggray -r74.50 -sOutputFile=./_site/thumb/cosinus_winkelmesser.png ./cosinus_winkelmesser.ps
           sudo -E gs -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/macmahon.png             ./macmahon.ps
+          sudo -E gs -sDEVICE=pnggray -r52.00 -sOutputFile=./_site/thumb/personalausweis.png      ./personalausweis.ps
           sudo -E gs -sDEVICE=pnggray -r62.50 -sOutputFile=./_site/thumb/planzeiger.png           ./planzeiger.ps
           sudo -E gs -sDEVICE=pnggray -r36.00 -sOutputFile=./_site/thumb/schneeflocke.png         ./schneeflocke.ps
           sudo -E gs -sDEVICE=pnggray -r36.30 -sOutputFile=./_site/thumb/spirale.png              ./spirale.ps
