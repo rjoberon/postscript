@@ -1,15 +1,15 @@
-%!PS-Adobe-2.0
+%!PS-Adobe-3.0
 
 %
 % Zeichnet einen Winkelmesser für das Cosinus-Maß
 %
 
+<< /PageSize [290 160] >> setpagedevice
+
 % Koordinatensystem initialisieren
 % Einheit: 1mm
 % Überlegung: 72 Postscript-Punkte sind ein Zoll, ein Zoll sind 25,4 mm
 2.8346456692 2.8346456692 scale
-10 10 translate
-
 
 % Standard-Linienbreite: 1/4 mm
 /lw 0.25 def
@@ -29,7 +29,7 @@ font-normal
 /tan {dup sin exch cos div} def
 
 % prints the cosinus of the angles
-% c0 delta c1 r 
+% c0 delta c1 r
 /print-anumbers {
     /r exch def
     % we multiply by 10 and use integral numbers to avoid rounding errors
@@ -38,19 +38,19 @@ font-normal
     /c0 exch 10 mul def
     gsave
     c0 delta neg c1 {
-	gsave
-	    10 div          % real cosinus
-	    dup    	    % for printing 
-	    acos neg rotate % basic rotation
-	    dup 0 gt {92 rotate}{88 rotate} ifelse % correction
-	    r 0 moveto      % move to position
-	    gsave
-		dup 0 gt {180 rotate} if % correction
-		% print cosinus
-		=string cvs
-		show
-	    grestore
-	grestore
+        gsave
+            10 div          % real cosinus
+            dup             % for printing
+            acos neg rotate % basic rotation
+            dup 0 gt {92 rotate}{88 rotate} ifelse % correction
+            r 0 moveto      % move to position
+            gsave
+                dup 0 gt {180 rotate} if % correction
+                % print cosinus
+                =string cvs
+                show
+            grestore
+        grestore
     } for
     grestore
 } def
@@ -65,12 +65,12 @@ font-normal
     gsave
     newpath
     1 cdist neg -1 { % alpha
-	gsave
-	    acos neg rotate
-	    0 r1 moveto
-	    0 r2 lineto
-	    stroke
-	grestore
+        gsave
+            acos neg rotate
+            0 r1 moveto
+            0 r2 lineto
+            stroke
+        grestore
     } for
     grestore
 } def
@@ -78,7 +78,7 @@ font-normal
 
 /draw-goniometer {
     % angles circle
-    45 50 translate
+    50 10 translate
     lw setlinewidth
     90 rotate
 
@@ -91,27 +91,27 @@ font-normal
     -10 50 moveto -10 -50 lineto stroke
     -10 -50 moveto 0 -50 lineto stroke
     0 -50 moveto 0 -40 lineto stroke
-    
+
     % ticks
     40 45 0.1 draw-cos
     41 45 0.05 draw-cos
     lw 2 div setlinewidth % half linewidth
     43 45 0.01 draw-cos
     lw setlinewidth
-    
+
     % cosinus numbers
     0.9 0.1 0.1 38.5 print-anumbers      % positive
     -0.1 0.1 -0.9 33.7 print-anumbers  % negative
 
     -90 rotate
-    
+
     % big cosinus numbers
     font-big
     % 0°
     -39 -1 moveto (1) show
     % 90°
     -1 36  moveto (0) show
-    % 180°    
+    % 180°
     36 -1 moveto (-1) show
 
     font-big
@@ -134,7 +134,7 @@ font-normal
     gsave                      26 -1 moveto (i) show 0 2 rmoveto font-normal (2) show grestore
 %    gsave 10 10 moveto (H) show /adieresis glyphshow (?) show grestore
     gsave 5 10 moveto (Messfehler) show grestore
-    
+
     % Mitte
     font-large
     -45 -8 moveto (Cosinus-Ma) show /germandbls glyphshow (-) show /Adieresis glyphshow (hnlichkeitsmesser) show
@@ -143,7 +143,7 @@ font-normal
     % Mittellinien
     0 -2 moveto 0 14 lineto stroke
     -14 0 moveto 24 0 lineto stroke
-    
+
 } def
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,7 +152,6 @@ font-normal
 %
 
 % lattice + angles circle
-gsave
-    15 95 translate
-    draw-goniometer
-grestore
+1 1 translate
+draw-goniometer
+showpage
