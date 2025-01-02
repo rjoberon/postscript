@@ -42,9 +42,11 @@ jobs:
       - name: Create thumbnails
         run: |
           sudo mkdir ./_site/thumb
-          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16 -r25.65 -sOutputFile=./_site/thumb/macmahon.png ./macmahon.ps
-          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16 -r37.70 -sOutputFile=./_size/thumb/planzeiger.png  planzeiger.ps
-          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16 -r25.65 -sOutputFile=./_site/thumb/voronoi.png ./voronoi.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pngmono -r74.50 -sOutputFile=./_site/thumb/cosinus_winkelmesser.png ./cosinus_winkelmesser.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/macmahon.png             ./macmahon.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pngmono -r62.50 -sOutputFile=./_size/thumb/planzeiger.png           ./planzeiger.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pngmono -r36.00 -sOutputFile=./_size/thumb/schneeflocke.png         ./schneeflocke.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16   -r36.30 -sOutputFile=./_site/thumb/voronoi.png              ./voronoi.ps
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
