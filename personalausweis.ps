@@ -1,4 +1,6 @@
-%!PS-Adobe-2.0
+%!PS-Adobe-3.0
+
+<< /PageSize [416 257] >> setpagedevice
 
 42 srand
 
@@ -21,7 +23,7 @@
 % globale Variablen
 /schriftgroesse 18 def
 /Courier findfont schriftgroesse scalefont setfont
-/vstart 750 def
+/vstart 240 def
 /vschritt schriftgroesse neg -5 add def
 /hstart 10 def
 
@@ -92,8 +94,9 @@ abltag 1 1 getinterval cvi 3 mul
 
 % Ausgabe
 /scratch 128 string def
-10 800 moveto (Bedeutung der Ziffern:) show
-hstart vstart moveto
+vstart dup hstart exch moveto
+(Bedeutung der Ziffern:) show
+2 vschritt mul add dup hstart exch moveto
 wohnort scratch cvs show
 nummer scratch cvs show
 3 index (0) cvs show
@@ -110,7 +113,7 @@ abltag scratch cvs show
 (<<<<<<) show
 0 index (000) cvs show
 
-vstart vschritt add dup hstart exch moveto
+vschritt add dup hstart exch moveto
 (Erstwohnsitz Kennzahl: ) show wohnort scratch cvs show
 vschritt add dup hstart exch moveto
 (laufende Zaehlnummer: ) show nummer scratch cvs show
@@ -126,3 +129,5 @@ vschritt add dup hstart exch moveto
 (Ablaufdatum-Monat: ) show ablmonat scratch cvs show
 vschritt add dup hstart exch moveto
 (Ablaufdatum-Tag: ) show abltag scratch cvs show
+
+showpage
