@@ -1,14 +1,18 @@
-%!PS-Adobe-2.0
+%!PS-Adobe-3.0
 
 %
 % Zeichnet einen Planzeiger ähnlich dem des DAV
 %
 
+% 120mm x 200mm plus roughly a 1mm margin
+<< /PageSize [346 573] >> setpagedevice
+
+
 % Koordinatensystem initialisieren
 % Einheit: 1mm
 % Überlegung: 72 Postscript-Punkte sind ein Zoll, ein Zoll sind 25,4 mm
-2.8346456692 2.8346456692 scale
-10 10 translate
+2.8346456692 dup scale
+1 1 translate
 
 % standard line width: 1/4 mm
 /lw 0.25 def
