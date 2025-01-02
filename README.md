@@ -44,6 +44,8 @@ Cubes](https://library.ethz.ch/en/locations-and-media/platforms/virtual-exhibiti
 
 ## [personalausweis.ps](personalausweis.ps)
 
+[![](thumb/personalausweis.png)](personalausweis.ps)
+
 Explaining the [document number for old German identity
 cards](https://de.wikipedia.org/wiki/Ausweisnummer#Personalausweis_g%C3%BCltig_bis_Oktober_2010).
 
