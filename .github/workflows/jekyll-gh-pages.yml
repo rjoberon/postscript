@@ -47,6 +47,7 @@ jobs:
           sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16m  -r36.30 -sOutputFile=./_site/thumb/macmahon.png             ./macmahon.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pngmono -r62.50 -sOutputFile=./_site/thumb/planzeiger.png           ./planzeiger.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pngmono -r36.00 -sOutputFile=./_site/thumb/schneeflocke.png         ./schneeflocke.ps
+          sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pnggray -r36.30 -sOutputFile=./_site/thumb/spirale.png              ./spirale.ps
           sudo gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=png16   -r36.30 -sOutputFile=./_site/thumb/voronoi.png              ./voronoi.ps
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

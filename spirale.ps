@@ -1,11 +1,15 @@
-%!PS-Adobe-2.0
+%!PS-Adobe-3.0
+
+% set page size to A4 portrait
+<< /PageSize [595 842] >> setpagedevice
+
 
 % -- Variablen --
 /alpha 30 def
 /abstand 5 def
 /laenge 40 def
 /anzahl 70 def
-/drehen 5 def 
+/drehen 5 def
 
 % interessante Werte:
 % alpha abstand anzahl drehen
@@ -18,7 +22,7 @@
 % -- vorher auf dem Stack: a b
 % -- nachher auf dem Stack: a' b'
 /male {
-  % draw a 
+  % draw a
   dup 0 moveto
   dup 0 exch alpha sin alpha cos div mul rlineto
   % rotate coordinate system
@@ -32,8 +36,8 @@
 %initial increment limit proc for
 /foo 0 def
 anzahl {
-  gsave 
-  abstand laenge {male} repeat stroke 
+  gsave
+  abstand laenge {male} repeat stroke
   grestore
   drehen rotate
   /foo foo 1 anzahl 1 sub div add def foo setgray % Farbe
