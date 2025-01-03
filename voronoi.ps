@@ -8,6 +8,12 @@
 %
 % ¹ https://de.wikipedia.org/wiki/Voronoi-Diagramm#Algorithmus_von_Fortune
 % ² https://web.archive.org/web/20200809223746/https://www.cs.hmc.edu/~mbrubeck/voronoi.html
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 3 of the License, or
+% (at your option) any later version.
+%
 
 % includes
 % (sort.inc) run         % is embedded, see below
@@ -29,72 +35,71 @@
 % https://personal.math.ubc.ca/~cass/graphics/manual/code/sort.inc
 /qsortdict 8 dict def
 qsortdict begin
-% args: /comp a L R x
-% effect: effects a partition into two pieces [L j] [i R]
-%     leaves i j on stack
-/partition { 8 dict begin
-/x exch def
-/j exch def
-/i exch def
-/a exch def
-load /comp exch def
-{
-  {
-    a i get x comp exec not {
-      exit
-    } if
-    /i i 1 add def
-  } loop
-  {
-    x a j get comp exec not {
-      exit
-    } if
-    /j j 1 sub def
-  } loop
-  i j le {
-    % swap a[i] a[j]
-    a j a i get
-    a i a j get
-    put put
-    /i i 1 add def
-    /j j 1 sub def
-  } if
-  i j gt {
-    exit
-  } if
-} loop
-i j
-end } def
-% args: /comp a L R
-% effect: sorts a[L .. R] according to comp
-/subsort {               % /c a L R
-    [ 3 1 roll ] 3 copy  % /c a [L R] /c a [L R]
-    aload aload pop      % /c a [L R] /c a L R L R
-    add 2 idiv           % /c a [L R] /c a L R (L+R)/2
-    3 index exch get     % /c a [L R] /c a L R x
-    partition            % /c a [L R] i j
+% effects a partition into two pieces [L j] [i R]
+% leaves i j on stack
+/partition {             % /comp a L R x --> i j
+    8 dict begin
+    /x exch def
+    /j exch def
+    /i exch def
+    /a exch def
+    load /comp exch def
+    {
+        {
+            a i get x comp exec not {
+                exit
+            } if
+            /i i 1 add def
+        } loop
+        {
+            x a j get comp exec not {
+                exit
+            } if
+            /j j 1 sub def
+        } loop
+        i j le {
+            % swap a[i] a[j]
+            a j a i get
+            a i a j get
+            put put
+            /i i 1 add def
+            /j j 1 sub def
+        } if
+        i j gt {
+            exit
+        } if
+    } loop
+    i j
+    end
+} def
+% sorts a[L .. R] according to comp
+/subsort {               % /comp a L R
+    [ 3 1 roll ] 3 copy  % /comp a [L R] /comp a [L R]
+    aload aload pop      % /comp a [L R] /comp a L R L R
+    add 2 idiv           % /comp a [L R] /comp a L R (L+R)/2
+    3 index exch get     % /comp a [L R] /comp a L R x
+    partition            % /comp a [L R] i j
     % if j > L subsort(a, L, j)
-    dup                  % /c a [L R] i j j
-    3 index 0 get gt {   % /c a [L R] i j
-        5 copy           % /c a [L R] i j /c a [L R] i j
-        exch pop         % /c a [L R] i j /c a [L R] j
-        exch 0 get exch  % ... /c a L j
+    dup                  % /comp a [L R] i j j
+    3 index 0 get gt {   % /comp a [L R] i j
+        5 copy           % /comp a [L R] i j /comp a [L R] i j
+        exch pop         % /comp a [L R] i j /comp a [L R] j
+        exch 0 get exch  % ... /comp a L j
         subsort
-    } if                 % /c a [L R] i j
-    pop dup              % /c a [L R] i i
+    } if                 % /comp a [L R] i j
+    pop dup              % /comp a [L R] i i
     % if i < R subsort(a, i, R)
-    2 index 1 get lt {   % /c a [L R] i
-        exch 1 get       % /c a i R
+    2 index 1 get lt {   % /comp a [L R] i
+        exch 1 get       % /comp a i R
         subsort
     }{
         4 { pop } repeat
     } ifelse
 } def
 end
-% args: /comp a
-% effect: sorts the array a
+% sorts the array a
 % comp returns truth of x < y for entries in a
-/quicksort {
+/quicksort {             % /comp a
     qsortdict begin
     dup length 1 gt {    % /comp a
         dup              % /comp a a
@@ -107,10 +112,7 @@ end
 } def
 
 % comparator for points
-%
-% input:  [px py] [qx qy]
-% output: [px py] < [qx qy]
-/points-comp {           % [px py] [qx qy]
+/points-comp {           % [px py] [qx qy] --> [px py] < [qx qy]
     2 dict begin
     % process arguments
     /p exch def
@@ -139,7 +141,7 @@ end
         stroke
     grestore
 } def
-% draw a point given as array [x y] at (x,y) as a circle with radius 1
+% draw a point given as an array [x y] at (x,y) as a circle with radius 1
 /draw-point-a {          % [x y]
     aload pop            % x y
     1 draw-point         %
@@ -159,10 +161,7 @@ end
 
 % array operations
 %
-% input:  [a1 a2 ... an] [b1 b2 ... bm]
-% output: [a1 a2 ... an b1 b2 .. bm]
-%
-/arr-concat {            % [a1 a2 ... an] [b1 b2 ... bm] → [a1 a2 ... an b1 b2 .. bm]
+/arr-concat {            % [a1 a2 ... an] [b1 b2 ... bm] --> [a1 a2 ... an b1 b2 .. bm]
     exch                 % [b1 b2 ... bm] [a1 a2 ... an]
     2 copy               % [b1 b2 ... bm] [a1 a2 ... an] [b1 b2 ... bm] [a1 a2 ... an]
     length exch length   % [b1 b2 ... bm] [a1 a2 ... an] n m
@@ -173,10 +172,7 @@ end
     putinterval          % [a1 a2 ... an b1 b2 .. bm]
 } def
 %
-% input:  [a1 a2 ... an]
-% output: [a2 ... an] a1
-%
-/arr-pop0 {              % [a1 a2 ... an] → [a2 ... an] a1
+/arr-pop0 {              % [a1 a2 ... an] --> [a2 ... an] a1
     dup dup length       % [a1 a2 ... an] [a1 a2 ... an] n
     exch                 % [a1 a2 ... an] n [a1 a2 ... an]
     0 get                % [a1 a2 ... an] n a1
@@ -191,21 +187,17 @@ end
 %
 % Circle Event
 %
-% Constructor.
-%
-% input: x point arc
-% output: cevent
-%
-/circle-event-new {      % x point arc
+% constructor
+/circle-event-new {      % x point arc --> cevent
     [ 4 1 roll true ]
     % [x point arc is_valid]
 } def
-% Getter for circle event. Input: cevent
+% getter for circle event. cevent --> value
 /circle-event-get-x     {0 get} def
 /circle-event-get-point {1 get} def
 /circle-event-get-arc   {2 get} def
 /circle-event-is-valid  {3 get} def
-% Setter for circle event. Input: cevent value
+% setter for circle event. cevent value
 /circle-event-set-x     {0 exch put} def
 /circle-event-set-point {1 exch put} def
 /circle-event-set-arc   {2 exch put} def
@@ -223,21 +215,21 @@ end
     3 -1 roll            % cevents 0 [... cevent]
     put
 } def
-/circle-events-pop {     %
+/circle-events-pop {     % --> cevent
     circle-events 0 get  % [...]
     arr-pop0             % [...] cevent
     circle-events 0      % [...] cevent cevents 0
     4 -1 roll            % cevent cevents 0 [...]
     put                  % cevent
 } def
-/circle-events-len {     %
+/circle-events-len {     % --> len
     circle-events 0 get  % [...]
     length               % |[...]|
 } def
-/circle-events-get {     % n
+/circle-events-get {     % n --> cevent[n]
     circle-events 0 get  % n cevents
     exch                 % cevents n
-    get                  % cevent_n
+    get                  % cevent[n]
 } def
 /circle-events-sort {    %
     (<circle-events-sort>) log-stack
@@ -246,9 +238,7 @@ end
     quicksort            % sorted_cevents  % inplace!
 } def
 % comparator for circle events
-% input:  x y
-% output: x > y
-/circle-events-comp {    % x y
+/circle-events-comp {    % x y --> x > y
     % return truth of x < y with both being circle-events
     circle-event-get-x   % x y.x
     exch                 % y.x x
@@ -258,23 +248,19 @@ end
 
 % Parabola Arc
 %
-% Contructor.
-%
-% input: point arc1 arc2
-% output: parabolaarc
-%
-/parabola-arc-new {      % point arc1 arc2
+% contructor
+/parabola-arc-new {      % point arc1 arc2 --> parabolaarc
     [ 4 1 roll null null null ]
     % [point previous_arc next_arc circle_event edge1 edge2]
 } def
-% Getter for parabola arc. Input: parabolaarc
+% getter for parabola arc. parabolaarc --> value
 /parabola-arc-get-point    {0 get} def
 /parabola-arc-get-previous {1 get} def
 /parabola-arc-get-next     {2 get} def
 /parabola-arc-get-cevent   {3 get} def
 /parabola-arc-get-edge1    {4 get} def
 /parabola-arc-get-edge2    {5 get} def
-% Setter for parabola arc. Input: parabolaarc value
+% setter for parabola arc. parabolaarc value
 /parabola-arc-set-previous {1 exch put} def
 /parabola-arc-set-next     {2 exch put} def
 /parabola-arc-set-cevent   {3 exch put} def
@@ -292,20 +278,17 @@ end
 
 % Voronoi Edge
 %
-% Constructor.
-%
-% input: point
-% output: vedge
-/voronoi-edge-new {      % point
+% constructor
+/voronoi-edge-new {      % point --> vedge
     [ exch [0 0] false ]
     % [point1 point2 is_finished]
     dup voronoi-edges-append
 } def
-% Getter for voronoi edge. Input: vedge
+% getter for voronoi edge. vedge --> value
 /voronoi-edge-get-point1   {0 get} def
 /voronoi-edge-get-point2   {1 get } def
 /voronoi-edge-is-finished  {2 get} def
-% Setter for voronoi edge. Input: vedge value
+% setter for voronoi edge. vedge value
 /voronoi-edge-set-point1   {0 exch put} def
 /voronoi-edge-set-point2   {1 exch put} def
 /voronoi-edge-set-finished {2 exch put} def
@@ -335,7 +318,6 @@ end
 } def
 
 % Root
-%
 /root [ null ] def
 /root-get {root 0 get} def
 /root-set {root 0 3 -1 roll put} def
@@ -370,8 +352,7 @@ end
         (<fortune loop>) log-stack
         % if ...
         circle-events-len
-        0 gt             % |cevents| > 0
-        { % len(fortune.circle_events) > 0
+        0 gt {           % |cevents| > 0
             0 circle-events-get
             circle-event-get-x
             1 index      % cevents[0].x [px py]
@@ -404,23 +385,13 @@ end
     end
 } def
 
-%
 % Process the remaining leftmost point (right of the sweep line).
-%
-% input: pn ... p0 x
-% no output
-%
 /process-point {         % pn ... p1 p0 x
     (<process-point>) log-stack
     add-new-arc          % pn ... p1
 } def
 
-%
 % Process circle event with the smallest x coordinate.
-%
-% no input
-% no output
-%
 /process-circle-event {
     (<process-circle-event>) log-stack
     3 dict begin
@@ -437,8 +408,7 @@ end
         /arc cevent circle-event-get-arc def
 
         % delete corresponding parabola arc
-        arc parabola-arc-get-previous null ne
-        {
+        arc parabola-arc-get-previous null ne {
             % arc.previous_arc.next_arc = arc.next_arc
             arc parabola-arc-get-previous
             arc parabola-arc-get-next parabola-arc-set-next
@@ -446,8 +416,7 @@ end
             arc parabola-arc-get-previous
             edge parabola-arc-set-edge2
         } if
-        arc parabola-arc-get-next null ne
-        {
+        arc parabola-arc-get-next null ne {
             % arc.next_arc.previous_arc = arc.previous_arc
             arc parabola-arc-get-next
             arc parabola-arc-get-previous parabola-arc-set-previous
@@ -457,15 +426,13 @@ end
         } if
 
         % finish adjacent edges of the parabola arc
-        arc parabola-arc-get-edge1 null ne
-        {
+        arc parabola-arc-get-edge1 null ne {
             % arc.edge1.finish(circle_event.point)
             arc parabola-arc-get-edge1
             cevent circle-event-get-point
             voronoi-edge-finish
         } if
-        arc parabola-arc-get-edge2 null ne
-        {
+        arc parabola-arc-get-edge2 null ne {
             % arc.edge2.finish(circle_event.point)
             arc parabola-arc-get-edge2
             cevent circle-event-get-point
@@ -473,15 +440,13 @@ end
         } if
 
         % check circle vents on both sides of the parabola arc
-        arc parabola-arc-get-previous null ne
-        {
+        arc parabola-arc-get-previous null ne {
             % self.check_circle_event(arc.previous_arc, circle_event.x)
             arc parabola-arc-get-previous
             cevent circle-event-get-x
             check-circle-event
         } if
-        arc parabola-arc-get-next null ne
-        {
+        arc parabola-arc-get-next null ne {
             % self.check_circle_event(arc.next_arc, circle_event.x)
             arc parabola-arc-get-next
             cevent circle-event-get-x
@@ -492,12 +457,7 @@ end
     end
 } def
 
-%
 % Add a new arc.
-%
-% input: [px py] x
-% no output
-%
 /add-new-arc {           % [px py] x
     (<add-new-arc>) log-stack
     5 dict begin
@@ -541,8 +501,7 @@ end
                 } {
                     false% [i1x i1y] != false
                 } ifelse
-                and      % [i1x i1y] != and !=
-                {
+                and {    % [i1x i1y] != and !=
                     % build new parabola arc ...
                     arc parabola-arc-get-point
                     arc
@@ -654,12 +613,7 @@ end
     end
 } def
 
-%
 % If necessary, create a new circle event for the given parabola arc.
-%
-% input: arc x
-% no output
-%
 /check-circle-event {    % arc x
     (<check-circle-event>) log-stack
     3 dict begin
@@ -670,11 +624,9 @@ end
     % invalidate current circle event
     % if arc.circle_event is not None and arc.circle_event.x != _x:
     arc parabola-arc-get-cevent dup
-    null ne              % cevent !=
-    {
+    null ne {            % cevent !=
         circle-event-get-x
-        x ne
-        {
+        x ne {
             % arc.circle_event.is_valid = False
             arc parabola-arc-get-cevent
             false circle-event-set-valid
@@ -690,16 +642,13 @@ end
     null ne
     arc parabola-arc-get-next
     null ne
-    and
-    {
+    and {
         arc parabola-arc-get-previous parabola-arc-get-point
         arc parabola-arc-get-point
         arc parabola-arc-get-next parabola-arc-get-point
-        get-rightmost-circle-point
-        {                % [px py] x
+        get-rightmost-circle-point {
             dup x        % [px py] x x _x
-            gt           % [px py] x x > _x
-            {            % [px py] x
+            gt {         % [px py] x x > _x
                 exch arc % x [px py] arc
                 circle-event-new
                 dup      % cevent cevent
@@ -716,14 +665,7 @@ end
 
 % Given three points, check whether they are all on one line. If not,
 % determine the x coordinate of the circle through all three points.
-%
-% input:
-%   [p1x p1y] [p2x p2y] [p3x p3y]
-% output:
-%   false
-%   [px py] x true
-%
-/get-rightmost-circle-point { % [p1x p1y] [p2x p2y] [p3x p3y]
+/get-rightmost-circle-point { % [p1x p1y] [p2x p2y] [p3x p3y] --> false | [px py] x true
     (<get-rightmost-circle-point>) log-stack
     12 dict begin
     % process arguments
@@ -738,8 +680,7 @@ end
     p3x p1x sub               % p3x - p1x
     p2y p1y sub               % p3x - p1x p2y - p1y
     mul                       % (p3x - p1x) * (p2y - p1y)
-    gt
-    { false }{                % leave with false on stack
+    gt { false }{             % leave with false on stack
         p2x p1x sub
         /x1 exch def
         p2y p1y sub
@@ -754,8 +695,7 @@ end
         2 mul                 % (x1 * (p3y - p2y) - y1 * (p3x - p2x)) * 2
         /a exch def
         % all three points on a line?
-        a 0 eq
-        { false }{            % leave with false on stack
+        a 0 eq { false }{     % leave with false on stack
             p3x p1x sub
             /x2 exch def
             p3y p1y sub
@@ -800,16 +740,9 @@ end
     end
 } def
 
-%
 % Compute intersection between parabola with given focal point and
 % parabola arc, if it exists.
-%
-% input: point arc
-% output:
-%   false
-%   [ix iy] true
-%
-/get-intersection {      % [px py] arc
+/get-intersection {      % [px py] arc --> false | [ix iy] true
     (<get-intersection>) log-stack
     5 dict begin
     % process arguments
@@ -821,9 +754,7 @@ end
     % if arc.point.x == point.x:
     arc parabola-arc-get-point
     aload pop
-    pop px eq {
-        false            % focal points match → return false
-    } {
+    pop px eq { false }{ % focal points match → return false
         % if arc.previous_arc is not None:
         arc parabola-arc-get-previous
         dup              % pa pa
@@ -870,8 +801,7 @@ end
         null eq
         py y2 le
         or               % arc.next_arc is None or point.y <= y2
-        and
-        {
+        and {
             [
                 py       % iy
                 arc parabola-arc-get-point
@@ -899,14 +829,9 @@ end
     end
 } def
 
-%
 % Determine the intersection of two parabolas with the given focal
 % points for a sweep line with the given x coordinate.
-%
-% input: [p1x p1y] [p2x p2y] x
-% output: [ix iy]
-%
-/get-parabolas-intersection { % [p1x p1y] [p2x p2y] x
+/get-parabolas-intersection { % [p1x p1y] [p2x p2y] x --> [ix iy]
     (<get-parabolas-intersection>) log-stack
     13 dict begin
     % process arguments
@@ -915,16 +840,13 @@ end
     aload pop /p1y exch def /p1x exch def
 
     p1x p1y                   % point
-    p1x p2x eq
-    { % special cases
+    p1x p2x eq { % special cases
         p1y p2y add 2 div     % (p1y + p2y) / 2 → iy'
     }{
-        p2x x eq
-        {
+        p2x x eq {
             p2y               % → iy'
         }{
-            p1x x eq
-            {
+            p1x x eq {
                 pop pop       %
                 p2x p2y       % p2x p2y
                 p1y           % → iy'
@@ -988,12 +910,7 @@ end
     end
 } def
 
-%
-% Finish adjacent edges of parabola arcs
-%
-% input: x1 y1 x2 y2
-% no output
-%
+% Finish adjacent edges of parabola arcs.
 /finish-edges {           % x1 y1 x2 y2
     (<finish-edges>) log-stack
     1 dict begin
@@ -1011,13 +928,9 @@ end
     /arc root-get def
     {
         arc parabola-arc-get-next
-        null eq
-        {
-            exit
-        } if
+        null eq { exit } if
         arc parabola-arc-get-edge2
-        null ne
-        {
+        null ne {
             % self.get_parabolas_intersection(arc.point, arc.next_arc.point, 2 * x)
             arc parabola-arc-get-point
             arc parabola-arc-get-next parabola-arc-get-point
@@ -1066,16 +979,13 @@ end
     } ifelse
 } def
 
-% a random number between 0 and 1
+% A random number between 0 and 1.
 /rfloat {
     rand 16#7fffffff div
 } def
 
-% a random point in the ranges [0 limx] and [0 limy]
-%
-% input:  limx limy
-% output: [randx randy]
-/rpoint {                % limx limy
+% A random point in the ranges [0 limx] and [0 limy].
+/rpoint {                % limx limy --> [randx randy]
     rfloat mul           % limx randy
     exch                 % randy limx
     rfloat mul           % randy randx
@@ -1086,7 +996,7 @@ end
 } def
 
 %
-% here the actual configuration and running of code starts
+% Here the actual configuration and running of code starts.
 %
 
 /nopoints 100 def        % number of points
