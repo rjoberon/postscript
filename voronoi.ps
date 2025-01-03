@@ -950,32 +950,22 @@ end
 /getrandseed {
     (%Calendar%) /IODevice resourcestatus {
         pop pop (%Calendar%) currentdevparams
-        dup /Running get {
-            % cal
-            dup
-            % cal cal
-            /Year get
-            % cal Year
-            2 1 roll dup /Month get	3 2 roll add
-            % cal Month+Year
-            2 1 roll dup /Day get 3 2 roll add
-            % cal Day+Month+Year
-            2 1 roll dup /Hour get 3 2 roll add
-            % cal Hour+Day+Month+Year
-            2 1 roll dup /Minute get 100 add 3 2 roll add
-            % cal Minute+Hour+Day+Month+Year
-            2 1 roll dup /Second get 100 add 3 2 roll add
-            % cal Second+Minute+Hour+Day+Month+Year
-            exch pop
-            % Second+Minute+Hour+Day+Month+Year
-            % do: x[n+1] = (16807 * x[n]) mod (2^31 - 1)
+        /Running get {
+            0            % sum
+            [/Second /Minute /Hour /Day /Month /Year /Weekday]
+            {            % key
+                (%Calendar%) currentdevparams
+                exch get % sum val
+                add      % sum
+            } forall     % sum=S+M+H+D+M+Y+W
+            % do [n+1] = (16807 * x[n]) mod (2^31 - 1)
             16807 mul
             2147483647 mod
         } {
-            (Clock/calendar is present but not running.\n) show
+            (clock/calendar is present but not running.\n) show
         } ifelse
     } {
-        (No clock/calendar present.\n) show
+        (no clock/calendar present.\n) show
     } ifelse
 } def
 
