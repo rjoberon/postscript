@@ -3,12 +3,13 @@
 %
 % MacMahon's Cubes
 %
-% see https://www.jstor.org/stable/24955792
+% https://www.jstor.org/stable/24955792
 %
-% Changelog:
-% 2021-11-21 (rja):
-% - initial version
-
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 3 of the License, or
+% (at your option) any later version.
+%
 
 % set page size to A4 portrait
 << /PageSize [595 842] >> setpagedevice
@@ -23,7 +24,7 @@ unit unit scale
 
 
 % global parameters
-/cubesize 20 def  % size of one cube
+/cubesize 25 def  % size of one cube
 /ratio 0.5 def    % relative size of inner square
 /gap 5 def        % gap between cubes
 
@@ -131,8 +132,7 @@ unit unit scale
             3 -1 roll    % cubes[row] cubes[row] col
             get          % cubes[row] cubes[row][col]
             dup 0 get    % cubes[row] cubes[row][col] i
-            0 ne         % cubes[row] cubes[row][col] i != 0
-            {
+            0 ne {       % cubes[row] cubes[row][col] i != 0
                 cubesize exch drawcube   % regular cube
             } {
                 pop                      % white cube
@@ -158,11 +158,11 @@ translate
 drawcubes
 grestore
 % page title
-/Helvetica findfont 16.5 scalefont setfont
+/Helvetica findfont 20 scalefont setfont
 (MacMahon's Cubes) dup % (MacMahon's Cubes) (MacMahon's Cubes)
 stringwidth            % (MacMahon's Cubes) width height
 pop                    % (MacMahon's Cubes) width
 210 exch sub 2 div     % (MacMahon's Cubes) xpos
-240 moveto             % (MacMahon's Cubes)
+250 moveto             % (MacMahon's Cubes)
 show
 showpage
