@@ -5,6 +5,8 @@
 %
 %
 % Changelog:
+% 2025-01-03 (rja):
+% - cleanups and addition of random seed
 % 2018-09-16 (rja):
 % - initial version
 %
@@ -34,12 +36,8 @@ unit unit scale
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % functions
 
-%
 % draw a square of size a at the current position
-%
-% input: a
-%
-/square {
+/square {                % a
     1 dict begin
     /a exch def
     %    newpath
@@ -52,18 +50,36 @@ unit unit scale
     end
 } def
 
+/getrandseed {
+    (%Calendar%) /IODevice resourcestatus {
+        pop pop (%Calendar%) currentdevparams
+        /Running get {
+            0            % sum
+            [/Second /Minute /Hour /Day /Month /Year /Weekday]
+            {            % key
+                (%Calendar%) currentdevparams
+                exch get % sum val
+                add      % sum
+            } forall
+                         % S+M+H+D+M+Y+W
+            % do [n+1] = (16807 * x[n]) mod (2^31 - 1)
+            16807 mul
+            2147483647 mod
+        } {
+            (clock/calendar is present but not running.\n) show
+        } ifelse
+    } {
+        (no clock/calendar present.\n) show
+    } ifelse
+} def
+
 % a random number between 0 and 1
 /rfloat {
     rand 16#7fffffff div
 } def
 
-%
 % get a random color
-%
-% input: spread
-% output: r g b (each a random value between 0 and 1)
-%
-/rcolor {
+/rcolor {                % --> r g b (each a random value between 0 and 1)
     1 dict begin
     {
         /r rfloat def
@@ -83,21 +99,17 @@ unit unit scale
     end
 } def
 
+getrandseed srand        % initialize PRNG
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % main program
-
-% horizontal loop
-0 squaresize hmax {
-    /x exch def
-    % vertical loop
-    0 squaresize vmax {
-        /y exch def
-        % move to point
-        x y moveto
-        % select color
+0 squaresize hmax {      % horizontal loop
+    0 squaresize vmax {  % vertical loop
+        1 index exch     % x x y
+        moveto
         rcolor setrgbcolor
-        % draw square
         squaresize square
     } for
+    pop
 } for
 showpage
